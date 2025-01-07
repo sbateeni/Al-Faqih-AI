@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دار الإفتاء الإسلامية</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --sidebar-bg: #ffffff;
+            --chat-bg: #ffffff;
+            --border-color: #dee2e6;
+            --hover-color: #f8f9fa;
+
+            /* ألوان العلماء */
+            --hanafi-color: #1565c0;
+            --maliki-color: #2e7d32;
+            --shafii-color: #c62828;
+            --hanbali-color: #6a1b9a;
+            --ashari-color: #283593;
+            --maturidi-color: #00695c;
+            --bukhari-color: #4527a0;
+            --muslim-color: #00838f;
+            --abu-dawood-color: #ad1457;
+            --tirmidhi-color: #1b5e20;
+            --nasai-color: #4a148c;
+            --ibn-majah-color: #827717;
+            --tabari-color: #bf360c;
+            --ibn-kathir-color: #0d47a1;
+            --jilani-color: #1a237e;
+            --ghazali-color: #880e4f;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Traditional Arabic', Arial, sans-serif;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .main-container {
+            display: flex;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: var(--sidebar-bg);
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+
+        .chat-container {
+            flex-grow: 1;
+            max-width: 800px;
+        }
+
+        .chat-box {
+            height: calc(100vh - 250px);
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+            background-color: var(--chat-bg);
+            margin-bottom: 1rem;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .question {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            margin-left: 20%;
+            border-radius: 15px 15px 0 15px;
+        }
+
+        .scholar-response {
+            margin-right: 20%;
+            border-radius: 15px 15px 15px 0;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .scholar-name {
+            position: absolute;
+            top: -1.5rem;
+            right: 1rem;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: inherit;
+        }
+
+        .scholar-title {
+            font-size: 0.8rem;
+            color: inherit;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        /* تنسيق ردود العلماء */
+        .scholar-response h3 {
+            font-weight: bold;
+            margin: 1rem 0;
+            font-size: 1.2rem;
+        }
+
+        .scholar-response p {
+            margin: 0.5rem 0;
+            line-height: 1.6;
+        }
+
+        .scholar-response ul, .scholar-response ol {
+            margin: 0.5rem 0;
+            padding-right: 1.5rem;
+        }
+
+        .scholar-response li {
+            margin: 0.3rem 0;
+        }
+
+        .scholar-response strong {
+            font-weight: bold;
+        }
+
+        .scholar-response em {
+            font-style: italic;
+        }
+
+        /* ألوان العلماء */
+        [data-scholar="abu-hanifa"] { background-color: #e3f2fd; color: var(--hanafi-color); }
+        [data-scholar="malik"] { background-color: #e8f5e9; color: var(--maliki-color); }
+        [data-scholar="shafii"] { background-color: #ffebee; color: var(--shafii-color); }
+        [data-scholar="ahmad"] { background-color: #f3e5f5; color: var(--hanbali-color); }
+        [data-scholar="ashari"] { background-color: #e8eaf6; color: var(--ashari-color); }
+        [data-scholar="maturidi"] { background-color: #e0f2f1; color: var(--maturidi-color); }
+        [data-scholar="bukhari"] { background-color: #ede7f6; color: var(--bukhari-color); }
+        [data-scholar="muslim"] { background-color: #e0f7fa; color: var(--muslim-color); }
+        [data-scholar="abu-dawood"] { background-color: #fce4ec; color: var(--abu-dawood-color); }
+        [data-scholar="tirmidhi"] { background-color: #e8f5e9; color: var(--tirmidhi-color); }
+        [data-scholar="nasai"] { background-color: #f3e5f5; color: var(--nasai-color); }
+        [data-scholar="ibn-majah"] { background-color: #f9fbe7; color: var(--ibn-majah-color); }
+        [data-scholar="tabari"] { background-color: #fbe9e7; color: var(--tabari-color); }
+        [data-scholar="ibn-kathir"] { background-color: #e3f2fd; color: var(--ibn-kathir-color); }
+        [data-scholar="jilani"] { background-color: #e8eaf6; color: var(--jilani-color); }
+        [data-scholar="ghazali"] { background-color: #fce4ec; color: var(--ghazali-color); }
+
+        .scholar-select {
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 300px;
+            }
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #212529;
+            --text-color: #f8f9fa;
+            --sidebar-bg: #343a40;
+            --chat-bg: #343a40;
+            --border-color: #495057;
+            --hover-color: #495057;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle i {
+            transition: all 0.3s ease;
+        }
+
+        .message.error {
+            background-color: #ffebee;
+            color: #c62828;
+            margin: 1rem auto;
+            max-width: 80%;
+            text-align: center;
+            border: 1px solid #ef9a9a;
+        }
+
+        .loading {
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        [data-theme="dark"] .message.error {
+            background-color: #311b1b;
+            color: #ef9a9a;
+            border-color: #c62828;
+        }
+
+        .message.scholar-response.comparison {
+            background-color: #f5f5f5;
+            border: 2px solid #9e9e9e;
+            margin: 2rem 10%;
+        }
+
+        .message.scholar-response.comparison .scholar-name {
+            color: #424242;
+        }
+
+        .message.scholar-response.comparison h3 {
+            color: #424242;
+            border-bottom: 1px solid #9e9e9e;
+            padding-bottom: 0.5rem;
+        }
+
+        [data-theme="dark"] .message.scholar-response.comparison {
+            background-color: #424242;
+            border-color: #757575;
+        }
+
+        [data-theme="dark"] .message.scholar-response.comparison .scholar-name,
+        [data-theme="dark"] .message.scholar-response.comparison h3 {
+            color: #e0e0e0;
+        }
+
+        /* تنسيق المذاهب */
+        [data-scholar="hanafi"] { border-right: 4px solid var(--hanafi-color); }
+        [data-scholar="maliki"] { border-right: 4px solid var(--maliki-color); }
+        [data-scholar="shafii"] { border-right: 4px solid var(--shafii-color); }
+        [data-scholar="hanbali"] { border-right: 4px solid var(--hanbali-color); }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-sun"></i>
+    </button>
+    <div class="main-container">
+        <div class="sidebar">
+            <h5 class="mb-3">اختر العالم</h5>
+            <select id="scholarSelect" class="form-select scholar-select">
+                <option value="all">جميع العلماء</option>
+                <option value="abu-hanifa">الإمام أبو حنيفة النعمان</option>
+                <option value="malik">الإمام مالك بن أنس</option>
+                <option value="shafii">الإمام محمد بن إدريس الشافعي</option>
+                <option value="ahmad">الإمام أحمد بن حنبل</option>
+                <option value="ashari">الإمام أبو الحسن الأشعري</option>
+                <option value="maturidi">الإمام أبو منصور الماتريدي</option>
+                <option value="bukhari">الإمام البخاري</option>
+                <option value="muslim">الإمام مسلم</option>
+                <option value="abu-dawood">الإمام أبو داود</option>
+                <option value="tirmidhi">الإمام الترمذي</option>
+                <option value="nasai">الإمام النسائي</option>
+                <option value="ibn-majah">الإمام ابن ماجه</option>
+                <option value="tabari">الإمام الطبري</option>
+                <option value="ibn-kathir">الإمام ابن كثير</option>
+                <option value="jilani">الإمام عبد القادر الجيلاني</option>
+                <option value="ghazali">الإمام أبو حامد الغزالي</option>
+            </select>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" class="form-control" placeholder="ابحث في الفتاوى السابقة...">
+            </div>
+            <div id="fatwasHistory">
+                <!-- سجل الفتاوى السابقة -->
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <h1 class="text-center mb-4">دار الإفتاء الإسلامية</h1>
+            
+            <div class="chat-box" id="chatBox">
+                <!-- المحادثات ستظهر هنا -->
+            </div>
+
+            <div class="loading" id="loading" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">جاري التحميل...</span>
+                </div>
+            </div>
+
+            <form id="questionForm" class="mt-3">
+                <div class="input-group">
+                    <input type="text" id="questionInput" class="form-control" placeholder="اكتب سؤالك هنا..." required>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> إرسال
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const scholars = {
+            'abu-hanifa': {
+                name: 'الإمام أبو حنيفة النعمان',
+                title: 'إمام المذهب الحنفي (80-150 هـ)'
+            },
+            'malik': {
+                name: 'الإمام مالك بن أنس',
+                title: 'إمام المذهب المالكي (93-179 هـ)'
+            },
+            'shafii': {
+                name: 'الإمام محمد بن إدريس الشافعي',
+                title: 'إمام المذهب الشافعي (150-204 هـ)'
+            },
+            'ahmad': {
+                name: 'الإمام أحمد بن حنبل',
+                title: 'إمام المذهب الحنبلي (164-241 هـ)'
+            },
+            'ashari': {
+                name: 'الإمام أبو الحسن الأشعري',
+                title: 'مؤسس المذهب الأشعري (260-324 هـ)'
+            },
+            'maturidi': {
+                name: 'الإمام أبو منصور الماتريدي',
+                title: 'مؤسس المذهب الماتريدي (238-333 هـ)'
+            },
+            'bukhari': {
+                name: 'الإمام البخاري',
+                title: 'صاحب صحيح البخاري (194-256 هـ)'
+            },
+            'muslim': {
+                name: 'الإمام مسلم',
+                title: 'صاحب صحيح مسلم (204-261 هـ)'
+            },
+            'abu-dawood': {
+                name: 'الإمام أبو داود',
+                title: 'صاحب سنن أبي داود (202-275 هـ)'
+            },
+            'tirmidhi': {
+                name: 'الإمام الترمذي',
+                title: 'صاحب جامع الترمذي (209-279 هـ)'
+            },
+            'nasai': {
+                name: 'الإمام النسائي',
+                title: 'صاحب سنن النسائي (215-303 هـ)'
+            },
+            'ibn-majah': {
+                name: 'الإمام ابن ماجه',
+                title: 'صاحب سنن ابن ماجه (209-273 هـ)'
+            },
+            'tabari': {
+                name: 'الإمام الطبري',
+                title: 'صاحب تفسير الطبري (224-310 هـ)'
+            },
+            'ibn-kathir': {
+                name: 'الإمام ابن كثير',
+                title: 'صاحب تفسير ابن كثير (700-774 هـ)'
+            },
+            'jilani': {
+                name: 'الإمام عبد القادر الجيلاني',
+                title: 'الشيخ عبد القادر الجيلاني (470-561 هـ)'
+            },
+            'ghazali': {
+                name: 'الإمام أبو حامد الغزالي',
+                title: 'حجة الإسلام (450-505 هـ)'
+            }
+        };
+
+        // تحديث عنوان API للفتوى
+        const API_URL = '/ask_fatwa';
+
+        // تحديث عنوان API للتحقق من حالة الخادم
+        const HEALTH_CHECK_URL = '/api/health';
+
+        function appendMessage(question, answers) {
+            console.log('إضافة رسالة جديدة:', { question, answers });
+            const chatBox = document.getElementById('chatBox');
+            
+            // إضافة السؤال
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'message question';
+            questionDiv.textContent = question;
+            chatBox.appendChild(questionDiv);
+            
+            try {
+                if (answers.type === 'multiple') {
+                    // إضافة إجابات المذاهب
+                    const madhahib = {
+                        'hanafi': {
+                            name: 'المذهب الحنفي',
+                            color: 'var(--hanafi-color)'
+                        },
+                        'maliki': {
+                            name: 'المذهب المالكي',
+                            color: 'var(--maliki-color)'
+                        },
+                        'shafii': {
+                            name: 'المذهب الشافعي',
+                            color: 'var(--shafii-color)'
+                        },
+                        'hanbali': {
+                            name: 'المذهب الحنبلي',
+                            color: 'var(--hanbali-color)'
+                        }
+                    };
+
+                    // إضافة إجابة كل مذهب
+                    for (const [madhab, response] of Object.entries(answers.responses)) {
+                        if (madhab === 'comparison') continue;
+                        
+                        const madhabInfo = madhahib[madhab];
+                        if (!madhabInfo) continue;
+
+                        const responseDiv = document.createElement('div');
+                        responseDiv.className = 'message scholar-response';
+                        responseDiv.setAttribute('data-scholar', madhab);
+                        
+                        responseDiv.innerHTML = `
+                            <div class="scholar-name">${madhabInfo.name}</div>
+                            <div class="scholar-title">علماء المذهب: ${response.scholars.join(' - ')}</div>
+                            ${formatAnswer(response.text)}
+                        `;
+                        
+                        chatBox.appendChild(responseDiv);
+                    }
+
+                    // إضافة التحليل المقارن
+                    if (answers.responses.comparison) {
+                        const comparisonDiv = document.createElement('div');
+                        comparisonDiv.className = 'message scholar-response comparison';
+                        comparisonDiv.innerHTML = `
+                            <div class="scholar-name">تحليل مقارن</div>
+                            <div class="scholar-title">مقارنة بين آراء المذاهب</div>
+                            ${formatAnswer(answers.responses.comparison.text)}
+                        `;
+                        chatBox.appendChild(comparisonDiv);
+                    }
+                } else {
+                    // إضافة إجابة عالم واحد
+                    const responseDiv = document.createElement('div');
+                    responseDiv.className = 'message scholar-response';
+                    responseDiv.setAttribute('data-scholar', answers.scholar || 'all');
+                    
+                    const scholar = scholars[answers.scholar] || {
+                        name: 'عالم إسلامي متخصص',
+                        title: 'متخصص في الفقه الإسلامي'
+                    };
+                    
+                    responseDiv.innerHTML = `
+                        <div class="scholar-name">${scholar.name}</div>
+                        <div class="scholar-title">${scholar.title}</div>
+                        ${formatAnswer(answers.text)}
+                    `;
+                    
+                    chatBox.appendChild(responseDiv);
+                }
+            } catch (error) {
+                console.error('خطأ في إضافة الرسالة:', error);
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'message error';
+                errorDiv.textContent = 'عذراً، حدث خطأ في عرض الإجابة. الرجاء المحاولة مرة أخرى.';
+                chatBox.appendChild(errorDiv);
+            }
+            
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function formatAnswer(text) {
+            if (!text) return '<p>لا توجد إجابة</p>';
+            
+            try {
+                return text
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .split('\n\n')
+                    .map(paragraph => {
+                        if (!paragraph.trim()) return '';
+                        if (paragraph.startsWith('* ')) {
+                            const items = paragraph.split('\n* ');
+                            return '<ul>' + items.map(item => 
+                                item.trim() ? '<li>' + item.replace('* ', '') + '</li>' : ''
+                            ).join('') + '</ul>';
+                        } else if (paragraph.startsWith('**')) {
+                            return '<h3>' + paragraph.replace(/\*\*/g, '') + '</h3>';
+                        } else {
+                            return '<p>' + paragraph + '</p>';
+                        }
+                    })
+                    .filter(html => html) // إزالة العناصر الفارغة
+                    .join('');
+            } catch (error) {
+                console.error('خطأ في تنسيق الإجابة:', error);
+                return '<p>حدث خطأ في تنسيق الإجابة</p>';
+            }
+        }
+
+        document.getElementById('questionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const questionInput = document.getElementById('questionInput');
+            const question = questionInput.value.trim();
+            const selectedScholar = document.getElementById('scholarSelect').value;
+            
+            if (!question) return;
+
+            document.getElementById('loading').style.display = 'block';
+
+            try {
+                console.log('إرسال الطلب:', { question, scholar: selectedScholar });
+                
+                const response = await fetch('/ask_fatwa', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        scholar: selectedScholar
+                    })
+                });
+
+                console.log('استلام الرد:', response.status);
+                const data = await response.json();
+                console.log('بيانات الرد:', data);
+                
+                if (response.ok) {
+                    appendMessage(question, {
+                        type: data.type,
+                        responses: data.responses,
+                        scholar: selectedScholar,
+                        text: data.response
+                    });
+                    questionInput.value = '';
+                } else {
+                    console.error('خطأ في الرد:', data);
+                    alert(data.error || 'حدث خطأ في معالجة السؤال');
+                }
+            } catch (error) {
+                console.error('خطأ في الاتصال:', error);
+                alert('حدث خطأ في الاتصال بالخادم. الرجاء التأكد من اتصالك بالإنترنت والمحاولة مرة أخرى.');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        });
+
+        function toggleTheme() {
+            const body = document.documentElement;
+            const themeToggle = document.querySelector('.theme-toggle i');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                themeToggle.className = 'fas fa-sun';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeToggle.className = 'fas fa-moon';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // تحميل الثيم المحفوظ
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.querySelector('.theme-toggle i').className = 'fas fa-moon';
+        }
+    </script>
+</body>
+</html> 

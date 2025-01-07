@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الصفحة الرئيسية</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --card-bg: #ffffff;
+            --border-color: #dee2e6;
+            --hover-color: #f8f9fa;
+            --modal-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #212529;
+            --text-color: #f8f9fa;
+            --card-bg: #343a40;
+            --border-color: #495057;
+            --hover-color: #495057;
+            --modal-bg: #343a40;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Traditional Arabic', Arial, sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .card-title {
+            color: var(--text-color);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-text {
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle i {
+            transition: all 0.3s ease;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #007bff;
+        }
+
+        .scholars-section {
+            margin-top: 4rem;
+        }
+
+        .scholars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .scholar-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .scholar-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .scholar-icon {
+            font-size: 2.5rem;
+            color: #007bff;
+            margin-bottom: 1rem;
+        }
+
+        .scholar-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .scholar-title {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+
+        .modal-content {
+            background-color: var(--modal-bg);
+            color: var(--text-color);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+        }
+
+        .bio-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .bio-section h4 {
+            color: #007bff;
+            margin-bottom: 1rem;
+        }
+
+        .bio-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .bio-list li {
+            margin-bottom: 0.5rem;
+            padding-right: 1.5rem;
+            position: relative;
+        }
+
+        .bio-list li:before {
+            content: "•";
+            color: #007bff;
+            position: absolute;
+            right: 0;
+        }
+
+        .holy-books-section {
+            padding: 2rem 0;
+            margin-bottom: 3rem;
+        }
+
+        .holy-book-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .holy-book-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .book-icon {
+            color: #007bff;
+            margin-bottom: 1rem;
+        }
+
+        .quran-content, .hadith-content {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-top: 1rem;
+            text-align: right;
+            line-height: 2;
+        }
+
+        .modal-xl {
+            max-width: 90%;
+        }
+
+        .surah-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #007bff;
+        }
+
+        .verse {
+            margin-bottom: 1rem;
+        }
+
+        .verse-number {
+            color: #007bff;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
+        .hadith-book {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #007bff;
+        }
+
+        .hadith-text {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background-color: var(--bg-color);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-sun"></i>
+    </button>
+
+    <div class="container">
+        <div class="header">
+            <h1>مرحباً بكم في منصة الاستشارات الإسلامية</h1>
+            <p>منصة متكاملة للبحث والاستشارة في العلوم الإسلامية</p>
+        </div>
+
+        <div class="features">
+            <div class="card">
+                <div class="feature-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h3 class="card-title">البحث في القرآن والسنة</h3>
+                <p class="card-text">ابحث في القرآن الكريم والأحاديث النبوية الشريفة واحصل على إجابات دقيقة مع المصادر</p>
+                <a href="/quran-sunnah" class="btn btn-primary">ابدأ البحث</a>
+            </div>
+
+            <div class="card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="card-title">استشارة العلماء</h3>
+                <p class="card-text">تواصل مع مجموعة من العلماء المتخصصين واحصل على الفتاوى الشرعية</p>
+                <a href="/fatwa" class="btn btn-primary">استشر العلماء</a>
+            </div>
+
+            <div class="card">
+                <div class="feature-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3 class="card-title">محادثة فردية</h3>
+                <p class="card-text">تحدث مع عالم محدد واحصل على إجابات مفصلة حسب المذهب الذي تختاره</p>
+                <a href="/chat" class="btn btn-primary">ابدأ المحادثة</a>
+            </div>
+        </div>
+
+        <!-- قسم القرآن والسنة -->
+        <div class="holy-books-section text-center my-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="holy-book-card" onclick="showQuran()">
+                        <div class="book-icon">
+                            <i class="fas fa-book-quran fa-3x"></i>
+                        </div>
+                        <h3 class="mt-3">القرآن الكريم</h3>
+                        <p>اقرأ وابحث في القرآن الكريم كاملاً</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="holy-book-card" onclick="showSunnah()">
+                        <div class="book-icon">
+                            <i class="fas fa-book-open fa-3x"></i>
+                        </div>
+                        <h3 class="mt-3">السنة النبوية</h3>
+                        <p>تصفح كتب السنة والأحاديث النبوية</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scholars-section">
+            <h2 class="text-center mb-4">العلماء المشاركون في المنصة</h2>
+            <div class="scholars-grid">
+                <!-- أئمة المذاهب -->
+                <div class="scholar-card" onclick="showBio('abu-hanifa')">
+                    <div class="scholar-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="scholar-name">الإمام أبو حنيفة النعمان</div>
+                    <div class="scholar-title">إمام المذهب الحنفي</div>
+                </div>
+
+                <div class="scholar-card" onclick="showBio('malik')">
+                    <div class="scholar-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="scholar-name">الإمام مالك بن أنس</div>
+                    <div class="scholar-title">إمام المذهب المالكي</div>
+                </div>
+
+                <div class="scholar-card" onclick="showBio('shafii')">
+                    <div class="scholar-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="scholar-name">الإمام محمد بن إدريس الشافعي</div>
+                    <div class="scholar-title">إمام المذهب الشافعي</div>
+                </div>
+
+                <div class="scholar-card" onclick="showBio('ahmad')">
+                    <div class="scholar-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="scholar-name">الإمام أحمد بن حنبل</div>
+                    <div class="scholar-title">إمام المذهب الحنبلي</div>
+                </div>
+
+                <!-- علماء العقيدة -->
+                <div class="scholar-card" onclick="showBio('ashari')">
+                    <div class="scholar-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="scholar-name">الإمام أبو الحسن الأشعري</div>
+                    <div class="scholar-title">مؤسس المذهب الأشعري</div>
+                </div>
+
+                <div class="scholar-card" onclick="showBio('maturidi')">
+                    <div class="scholar-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="scholar-name">الإمام أبو منصور الماتريدي</div>
+                    <div class="scholar-title">مؤسس المذهب الماتريدي</div>
+                </div>
+
+                <!-- أصحاب الصحاح والسنن -->
+                <div class="scholar-card" onclick="showBio('bukhari')">
+                    <div class="scholar-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="scholar-name">الإمام البخاري</div>
+                    <div class="scholar-title">صاحب صحيح البخاري</div>
+                </div>
+
+                <div class="scholar-card" onclick="showBio('muslim')">
+                    <div class="scholar-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="scholar-name">الإمام مسلم</div>
+                    <div class="scholar-title">صاحب صحيح مسلم</div>
+                </div>
+
+                <div class="scholar-card" onclick="showBio('abu-dawood')">
+                    <div class="scholar-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="scholar-name">الإمام أبو داود</div>
+                    <div class="scholar-title">صاحب سنن أبي داود</div>
+                </div>
+
+                <div class="scholar-card" onclick="showBio('tirmidhi')">
+                    <div class="scholar-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="scholar-name">الإمام الترمذي</div>
+                    <div class="scholar-title">صاحب جامع الترمذي</div>
+                </div>
+
+                <div class="scholar-card" onclick="showBio('nasai')">
+                    <div class="scholar-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="scholar-name">الإمام النسائي</div>
+                    <div class="scholar-title">صاحب سنن النسائي</div>
+                </div>
+
+                <div class="scholar-card" onclick="showBio('ibn-majah')">
+                    <div class="scholar-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="scholar-name">الإمام ابن ماجه</div>
+                    <div class="scholar-title">صاحب سنن ابن ماجه</div>
+                </div>
+
+                <!-- المفسرون -->
+                <div class="scholar-card" onclick="showBio('tabari')">
+                    <div class="scholar-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="scholar-name">الإمام الطبري</div>
+                    <div class="scholar-title">صاحب تفسير الطبري</div>
+                </div>
+
+                <div class="scholar-card" onclick="showBio('ibn-kathir')">
+                    <div class="scholar-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="scholar-name">الإمام ابن كثير</div>
+                    <div class="scholar-title">صاحب تفسير ابن كثير</div>
+                </div>
+
+                <!-- علماء التصوف والتزكية -->
+                <div class="scholar-card" onclick="showBio('jilani')">
+                    <div class="scholar-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="scholar-name">الشيخ عبد القادر الجيلاني</div>
+                    <div class="scholar-title">محيي الدين</div>
+                </div>
+
+                <div class="scholar-card" onclick="showBio('ghazali')">
+                    <div class="scholar-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="scholar-name">الإمام أبو حامد الغزالي</div>
+                    <div class="scholar-title">حجة الإسلام</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Quran -->
+        <div class="modal fade" id="quranModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">القرآن الكريم</h5>
+                        <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="quran-search mb-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="quranSearch" placeholder="ابحث في القرآن الكريم...">
+                                <button class="btn btn-primary" type="button" onclick="searchQuran()">
+                                    <i class="fas fa-search"></i>
+                                    بحث
+                                </button>
+                            </div>
+                        </div>
+                        <div class="quran-navigation mb-4">
+                            <select class="form-select" id="surahSelect" onchange="selectSurah()">
+                                <option value="">اختر السورة...</option>
+                                <!-- سيتم ملء هذه القائمة بالجافاسكريبت -->
+                            </select>
+                        </div>
+                        <div class="quran-content" id="quranContent">
+                            <!-- سيتم عرض محتوى القرآن هنا -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Sunnah -->
+        <div class="modal fade" id="sunnahModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">السنة النبوية</h5>
+                        <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="sunnah-search mb-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="hadithSearch" placeholder="ابحث في الأحاديث...">
+                                <button class="btn btn-primary" type="button" onclick="searchHadith()">
+                                    <i class="fas fa-search"></i>
+                                    بحث
+                                </button>
+                            </div>
+                        </div>
+                        <div class="books-navigation mb-4">
+                            <select class="form-select" id="bookSelect" onchange="selectBook()">
+                                <option value="">اختر الكتاب...</option>
+                                <option value="bukhari">صحيح البخاري</option>
+                                <option value="muslim">صحيح مسلم</option>
+                                <option value="abu-dawood">سنن أبي داود</option>
+                                <option value="tirmidhi">جامع الترمذي</option>
+                                <option value="nasai">سنن النسائي</option>
+                                <option value="ibn-majah">سنن ابن ماجه</option>
+                            </select>
+                        </div>
+                        <div class="hadith-content" id="hadithContent">
+                            <!-- سيتم عرض محتوى الحديث هنا -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            const scholarBios = {
+                'abu-hanifa': {
+                    name: 'الإمام أبو حنيفة النعمان',
+                    title: 'إمام المذهب الحنفي',
+                    birth: '80 هـ (699 م)',
+                    death: '150 هـ (767 م)',
+                    location: 'الكوفة، العراق',
+                    bio: 'هو النعمان بن ثابت الكوفي، أحد أئمة المذاهب الأربعة عند أهل السنة والجماعة، وصاحب المذهب الحنفي. عُرف بالذكاء الحاد والفطنة وقوة الحجة.',
+                    achievements: [
+                        'تأسيس المذهب الحنفي',
+                        'وضع أسس الفقه الإسلامي',
+                        'تدريب العديد من العلماء البارزين',
+                        'تطوير منهجية الاستنباط الفقهي',
+                        'إرساء قواعد القياس في الفقه'
+                    ],
+                    works: [
+                        'الفقه الأكبر',
+                        'العالم والمتعلم',
+                        'المسند في الحديث',
+                        'الوصية'
+                    ]
+                },
+                'malik': {
+                    name: 'الإمام مالك بن أنس',
+                    title: 'إمام المذهب المالكي',
+                    birth: '93 هـ (711 م)',
+                    death: '179 هـ (795 م)',
+                    location: 'المدينة المنورة',
+                    bio: 'هو مالك بن أنس الأصبحي، إمام دار الهجرة وأحد أئمة المذاهب الأربعة. عُرف بشدة تحريه في الحديث وتثبته في الفتوى.',
+                    achievements: [
+                        'تأليف كتاب الموطأ',
+                        'تأسيس المذهب المالكي',
+                        'تدوين السنة النبوية',
+                        'تعليم آلاف الطلاب',
+                        'تأصيل عمل أهل المدينة'
+                    ],
+                    works: [
+                        'الموطأ',
+                        'المدونة الكبرى',
+                        'رسالة في القدر',
+                        'تفسير غريب القرآن'
+                    ]
+                },
+                'shafii': {
+                    name: 'الإمام محمد بن إدريس الشافعي',
+                    title: 'إمام المذهب الشافعي',
+                    birth: '150 هـ (767 م)',
+                    death: '204 هـ (820 م)',
+                    location: 'غزة، فلسطين',
+                    bio: 'هو محمد بن إدريس الشافعي، مؤسس علم أصول الفقه وصاحب المذهب الشافعي. جمع بين علوم أهل الحديث وأهل الرأي.',
+                    achievements: [
+                        'تأسيس علم أصول الفقه',
+                        'تأليف كتاب الرسالة',
+                        'الجمع بين مدرستي الحديث والرأي',
+                        'تطوير منهجية الاستدلال الفقهي',
+                        'وضع قواعد الترجيح بين الأدلة'
+                    ],
+                    works: [
+                        'الرسالة',
+                        'الأم',
+                        'اختلاف الحديث',
+                        'المسند',
+                        'أحكام القرآن'
+                    ]
+                },
+                'ahmad': {
+                    name: 'الإمام أحمد بن حنبل',
+                    title: 'إمام المذهب الحنبلي',
+                    birth: '164 هـ (780 م)',
+                    death: '241 هـ (855 م)',
+                    location: 'بغداد، العراق',
+                    bio: 'هو أحمد بن محمد بن حنبل الشيباني، رابع الأئمة الأربعة عند أهل السنة والجماعة. عُرف بتمسكه بالسنة وصبره في المحنة.',
+                    achievements: [
+                        'تأليف المسند',
+                        'الصمود في محنة خلق القرآن',
+                        'جمع أكثر من 30,000 حديث',
+                        'تأسيس المذهب الحنبلي',
+                        'الدفاع عن عقيدة السلف'
+                    ],
+                    works: [
+                        'المسند',
+                        'الزهد',
+                        'العلل ومعرفة الرجال',
+                        'الورع',
+                        'الرد على الجهمية'
+                    ]
+                },
+                'ashari': {
+                    name: 'الإمام أبو الحسن الأشعري',
+                    title: 'مؤسس المذهب الأشعري',
+                    birth: '260 هـ (874 م)',
+                    death: '324 هـ (936 م)',
+                    location: 'البصرة، العراق',
+                    bio: 'هو علي بن إسماعيل الأشعري، مؤسس المذهب الأشعري في العقيدة. كان في بداية حياته معتزلياً ثم رجع عن الاعتزال.',
+                    achievements: [
+                        'تأسيس المذهب الأشعري',
+                        'الرد على المعتزلة',
+                        'تطوير علم الكلام',
+                        'الجمع بين العقل والنقل',
+                        'نصرة عقيدة أهل السنة'
+                    ],
+                    works: [
+                        'مقالات الإسلاميين',
+                        'الإبانة عن أصول الديانة',
+                        'اللمع في الرد على أهل الزيغ والبدع',
+                        'رسالة إلى أهل الثغر'
+                    ]
+                },
+                'maturidi': {
+                    name: 'الإمام أبو منصور الماتريدي',
+                    title: 'مؤسس المذهب الماتريدي',
+                    birth: '238 هـ (853 م)',
+                    death: '333 هـ (944 م)',
+                    location: 'سمرقند، أوزبكستان',
+                    bio: 'هو محمد بن محمد بن محمود الماتريدي، مؤسس المذهب الماتريدي في العقيدة. عُرف بدفاعه عن عقيدة أهل السنة.',
+                    achievements: [
+                        'تأسيس المذهب الماتريدي',
+                        'الدفاع عن العقيدة السنية',
+                        'تطوير المنهج العقلي',
+                        'الرد على المعتزلة والفلاسفة',
+                        'شرح أصول الدين'
+                    ],
+                    works: [
+                        'كتاب التوحيد',
+                        'تأويلات أهل السنة',
+                        'كتاب المقالات',
+                        'رد أوائل الأدلة للكعبي'
+                    ]
+                },
+                'bukhari': {
+                    name: 'الإمام البخاري',
+                    title: 'صاحب صحيح البخاري',
+                    birth: '194 هـ (810 م)',
+                    death: '256 هـ (870 م)',
+                    location: 'بخارى، أوزبكستان',
+                    bio: 'هو محمد بن إسماعيل البخاري، أمير المؤمنين في الحديث وصاحب أصح كتاب بعد كتاب الله.',
+                    achievements: [
+                        'تأليف صحيح البخاري',
+                        'وضع علم الجرح والتعديل',
+                        'جمع وتصنيف الأحاديث الصحيحة',
+                        'تطوير منهج نقد الحديث',
+                        'تدريب جيل من المحدثين'
+                    ],
+                    works: [
+                        'الجامع الصحيح (صحيح البخاري)',
+                        'التاريخ الكبير',
+                        'الأدب المفرد',
+                        'خلق أفعال العباد'
+                    ]
+                },
+                'muslim': {
+                    name: 'الإمام مسلم',
+                    title: 'صاحب صحيح مسلم',
+                    birth: '204 هـ (819 م)',
+                    death: '261 هـ (875 م)',
+                    location: 'نيسابور، إيران',
+                    bio: 'هو مسلم بن الحجاج القشيري النيسابوري، صاحب ثاني أصح كتاب في الحديث بعد صحيح البخاري.',
+                    achievements: [
+                        'تأليف صحيح مسلم',
+                        'تطوير منهج جمع الحديث',
+                        'تنظيم الأحاديث موضوعياً',
+                        'تمييز الروايات الصحيحة',
+                        'خدمة السنة النبوية'
+                    ],
+                    works: [
+                        'الجامع الصحيح (صحيح مسلم)',
+                        'الطبقات',
+                        'العلل',
+                        'المنفردات والوحدان'
+                    ]
+                },
+                'abu-dawood': {
+                    name: 'الإمام أبو داود',
+                    title: 'صاحب سنن أبي داود',
+                    birth: '202 هـ (817 م)',
+                    death: '275 هـ (889 م)',
+                    location: 'سجستان، إيران',
+                    bio: 'هو سليمان بن الأشعث السجستاني، صاحب السنن وأحد أئمة الحديث المشهورين.',
+                    achievements: [
+                        'تأليف السنن',
+                        'جمع أحاديث الأحكام',
+                        'تصنيف الأحاديث الفقهية',
+                        'خدمة السنة النبوية',
+                        'تدريب العلماء'
+                    ],
+                    works: [
+                        'السنن',
+                        'المراسيل',
+                        'الزهد',
+                        'مسائل الإمام أحمد'
+                    ]
+                },
+                'tirmidhi': {
+                    name: 'الإمام الترمذي',
+                    title: 'صاحب جامع الترمذي',
+                    birth: '209 هـ (824 م)',
+                    death: '279 هـ (892 م)',
+                    location: 'ترمذ، أوزبكستان',
+                    bio: 'هو محمد بن عيسى الترمذي، صاحب الجامع وأحد أئمة الحديث الستة.',
+                    achievements: [
+                        'تأليف الجامع',
+                        'بيان درجات الأحاديث',
+                        'جمع آراء الفقهاء',
+                        'تطوير علم العلل',
+                        'خدمة السنة النبوية'
+                    ],
+                    works: [
+                        'الجامع (سنن الترمذي)',
+                        'العلل',
+                        'الشمائل المحمدية',
+                        'الأسماء والكنى'
+                    ]
+                },
+                'nasai': {
+                    name: 'الإمام النسائي',
+                    title: 'صاحب سنن النسائي',
+                    birth: '215 هـ (829 م)',
+                    death: '303 هـ (915 م)',
+                    location: 'نسا، تركمانستان',
+                    bio: 'هو أحمد بن شعيب النسائي، صاحب السنن الكبرى والصغرى وأحد أئمة الحديث الستة.',
+                    achievements: [
+                        'تأليف السنن الكبرى والصغرى',
+                        'تطوير منهج نقد الرجال',
+                        'جمع الأحاديث وتصنيفها',
+                        'خدمة السنة النبوية',
+                        'تدريب المحدثين'
+                    ],
+                    works: [
+                        'السنن الكبرى',
+                        'السنن الصغرى (المجتبى)',
+                        'خصائص علي',
+                        'فضائل الصحابة'
+                    ]
+                },
+                'ibn-majah': {
+                    name: 'الإمام ابن ماجه',
+                    title: 'صاحب سنن ابن ماجه',
+                    birth: '209 هـ (824 م)',
+                    death: '273 هـ (887 م)',
+                    location: 'قزوين، إيران',
+                    bio: 'هو محمد بن يزيد القزويني، صاحب السنن وأحد أئمة الحديث الستة.',
+                    achievements: [
+                        'تأليف السنن',
+                        'جمع الأحاديث النبوية',
+                        'تصنيف الأحاديث الفقهية',
+                        'خدمة السنة النبوية',
+                        'الرحلة في طلب الحديث'
+                    ],
+                    works: [
+                        'السنن',
+                        'التفسير',
+                        'التاريخ',
+                        'كتاب الأدب'
+                    ]
+                },
+                'tabari': {
+                    name: 'الإمام الطبري',
+                    title: 'صاحب تفسير الطبري',
+                    birth: '224 هـ (839 م)',
+                    death: '310 هـ (923 م)',
+                    location: 'آمل، إيران',
+                    bio: 'هو محمد بن جرير الطبري، إمام المفسرين والمؤرخين وصاحب التفسير المشهور.',
+                    achievements: [
+                        'تأليف تفسير القرآن بالمأثور',
+                        'كتابة تاريخ الأمم والملوك',
+                        'الاجتهاد في الفقه',
+                        'تأسيس مدرسة في التفسير',
+                        'الجمع بين الرواية والدراية'
+                    ],
+                    works: [
+                        'جامع البيان في تأويل القرآن',
+                        'تاريخ الأمم والملوك',
+                        'تهذيب الآثار',
+                        'اختلاف الفقهاء'
+                    ]
+                },
+                'ibn-kathir': {
+                    name: 'الإمام ابن كثير',
+                    title: 'صاحب تفسير ابن كثير',
+                    birth: '700 هـ (1300 م)',
+                    death: '774 هـ (1373 م)',
+                    location: 'دمشق، سوريا',
+                    bio: 'هو إسماعيل بن عمر بن كثير، الحافظ المؤرخ المفسر وتلميذ ابن تيمية.',
+                    achievements: [
+                        'تأليف التفسير بالمأثور',
+                        'كتابة البداية والنهاية',
+                        'خدمة الحديث والتفسير',
+                        'نشر علوم الشريعة',
+                        'التأليف في التاريخ'
+                    ],
+                    works: [
+                        'تفسير القرآن العظيم',
+                        'البداية والنهاية',
+                        'جامع المسانيد',
+                        'طبقات الشافعية'
+                    ]
+                },
+                'jilani': {
+                    name: 'الشيخ عبد القادر الجيلاني',
+                    title: 'محيي الدين',
+                    birth: '470 هـ (1077 م)',
+                    death: '561 هـ (1166 م)',
+                    location: 'جيلان، إيران',
+                    bio: 'هو عبد القادر بن أبي صالح الجيلاني، شيخ الإسلام وقطب بغداد ومؤسس الطريقة القادرية.',
+                    achievements: [
+                        'تأسيس الطريقة القادرية',
+                        'إحياء علوم التصوف',
+                        'تربية المريدين',
+                        'نشر العلم والدعوة',
+                        'إصلاح المجتمع'
+                    ],
+                    works: [
+                        'الغنية لطالبي طريق الحق',
+                        'الفتح الرباني',
+                        'فتوح الغيب',
+                        'حزب الرجاء والانتهاء'
+                    ]
+                },
+                'ghazali': {
+                    name: 'الإمام أبو حامد الغزالي',
+                    title: 'حجة الإسلام',
+                    birth: '450 هـ (1058 م)',
+                    death: '505 هـ (1111 م)',
+                    location: 'طوس، إيران',
+                    bio: 'هو محمد بن محمد الغزالي الطوسي، حجة الإسلام ومجدد القرن الخامس الهجري.',
+                    achievements: [
+                        'تأليف إحياء علوم الدين',
+                        'الجمع بين الشريعة والحقيقة',
+                        'تجديد علوم الدين',
+                        'نقد الفلسفة',
+                        'إصلاح التصوف'
+                    ],
+                    works: [
+                        'إحياء علوم الدين',
+                        'تهافت الفلاسفة',
+                        'المستصفى',
+                        'المنقذ من الضلال'
+                    ]
+                }
+            };
+
+            function showBio(scholarId) {
+                const scholar = scholarBios[scholarId];
+                const modal = new bootstrap.Modal(document.getElementById('scholarModal'));
+                
+                document.getElementById('modalTitle').textContent = scholar.name;
+                
+                const modalBody = document.getElementById('modalBody');
+                modalBody.innerHTML = `
+                    <div class="bio-section">
+                        <h4>نبذة تعريفية</h4>
+                        <p>${scholar.bio}</p>
+                    </div>
+                    
+                    <div class="bio-section">
+                        <h4>معلومات أساسية</h4>
+                        <ul class="bio-list">
+                            <li>المولد: ${scholar.birth}</li>
+                            <li>الوفاة: ${scholar.death}</li>
+                            <li>المكان: ${scholar.location}</li>
+                            <li>اللقب: ${scholar.title}</li>
+                        </ul>
+                    </div>
+
+                    <div class="bio-section">
+                        <h4>أهم الإنجازات</h4>
+                        <ul class="bio-list">
+                            ${scholar.achievements.map(achievement => `<li>${achievement}</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div class="bio-section">
+                        <h4>أشهر المؤلفات</h4>
+                        <ul class="bio-list">
+                            ${scholar.works.map(work => `<li>${work}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                
+                modal.show();
+            }
+
+            function toggleTheme() {
+                const body = document.documentElement;
+                const themeToggle = document.querySelector('.theme-toggle i');
+                
+                if (body.getAttribute('data-theme') === 'dark') {
+                    body.removeAttribute('data-theme');
+                    themeToggle.className = 'fas fa-sun';
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    body.setAttribute('data-theme', 'dark');
+                    themeToggle.className = 'fas fa-moon';
+                    localStorage.setItem('theme', 'dark');
+                }
+            }
+
+            // تحميل الثيم المحفوظ
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.querySelector('.theme-toggle i').className = 'fas fa-moon';
+            }
+
+            // دالة لعرض رسالة الخطأ
+            function showError(container, message) {
+                container.innerHTML = `
+                    <div class="alert alert-danger text-center" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        ${message}
+                        <div class="mt-2">
+                            <button class="btn btn-outline-danger btn-sm" onclick="retryLastOperation()">
+                                <i class="fas fa-redo me-1"></i>
+                                إعادة المحاولة
+                            </button>
+                        </div>
+                    </div>`;
+            }
+
+            // دالة إعادة المحاولة
+            let lastOperation = null;
+            function retryLastOperation() {
+                if (lastOperation) {
+                    lastOperation();
+                }
+            }
+
+            // دالة التحقق من حالة الخادم
+            async function checkServerStatus() {
+                try {
+                    const response = await fetch('/api/health');
+                    if (!response.ok) {
+                        showServerError();
+                        return false;
+                    }
+                    return true;
+                } catch (error) {
+                    console.error('Server health check failed:', error);
+                    showServerError();
+                    return false;
+                }
+            }
+
+            // دالة عرض رسالة خطأ الاتصال بالخادم
+            function showServerError() {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger position-fixed top-0 start-50 translate-middle-x mt-3';
+                errorDiv.style.zIndex = '9999';
+                errorDiv.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span>لا يمكن الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.</span>
+                        <button type="button" class="btn-close me-2" onclick="this.parentElement.parentElement.remove()"></button>
+                    </div>
+                    <div class="text-center mt-2">
+                        <button class="btn btn-outline-danger btn-sm" onclick="retryConnection()">
+                            <i class="fas fa-redo me-1"></i>
+                            إعادة المحاولة
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(errorDiv);
+            }
+
+            // دالة إعادة محاولة الاتصال
+            async function retryConnection() {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(alert => alert.remove());
+                
+                const isConnected = await checkServerStatus();
+                if (isConnected) {
+                    const successDiv = document.createElement('div');
+                    successDiv.className = 'alert alert-success position-fixed top-0 start-50 translate-middle-x mt-3';
+                    successDiv.style.zIndex = '9999';
+                    successDiv.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <span>تم الاتصال بالخادم بنجاح</span>
+                            <button type="button" class="btn-close me-2" onclick="this.parentElement.parentElement.remove()"></button>
+                        </div>
+                    `;
+                    document.body.appendChild(successDiv);
+                    setTimeout(() => successDiv.remove(), 3000);
+                }
+            }
+
+            // تحديث دوال البحث والتحميل للتحقق من حالة الخادم أولاً
+            async function searchQuran() {
+                if (!await checkServerStatus()) return;
+                
+                const searchText = document.getElementById('quranSearch').value;
+                const quranContent = document.getElementById('quranContent');
+
+                if (!searchText.trim()) {
+                    quranContent.innerHTML = '<p class="text-center">الرجاء إدخال نص للبحث</p>';
+                    return;
+                }
+
+                lastOperation = () => searchQuran();
+                quranContent.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> جاري البحث...</div>';
+
+                try {
+                    const response = await fetch(`/api/quran/search?q=${encodeURIComponent(searchText)}`);
+                    if (!response.ok) throw new Error('حدث خطأ في الاتصال بالخادم');
+                    
+                    const data = await response.json();
+                    if (data.results && data.results.length > 0) {
+                        let content = `<div class="search-results">`;
+                        content += `<h3 class="mb-4">نتائج البحث عن: "${searchText}"</h3>`;
+                        
+                        data.results.forEach(result => {
+                            content += `
+                                <div class="search-result mb-4">
+                                    <div class="surah-name mb-2">سورة ${result.surah_name} - الآية ${result.verse_number}</div>
+                                    <div class="verse-text">${result.text}</div>
+                                </div>`;
+                        });
+                        content += '</div>';
+                        quranContent.innerHTML = content;
+                    } else {
+                        quranContent.innerHTML = `
+                            <div class="alert alert-info text-center" role="alert">
+                                <i class="fas fa-info-circle me-2"></i>
+                                لم يتم العثور على نتائج للبحث
+                            </div>`;
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showError(quranContent, 'حدث خطأ في الاتصال بالخادم. الرجاء المحاولة مرة أخرى.');
+                }
+            }
+
+            // تحديث دالة اختيار السورة
+            async function selectSurah() {
+                if (!await checkServerStatus()) return;
+                
+                const surahId = document.getElementById('surahSelect').value;
+                const quranContent = document.getElementById('quranContent');
+                
+                if (!surahId) {
+                    quranContent.innerHTML = '<p class="text-center">الرجاء اختيار سورة</p>';
+                    return;
+                }
+
+                lastOperation = () => selectSurah();
+                quranContent.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> جاري تحميل السورة...</div>';
+
+                try {
+                    const response = await fetch(`/api/quran/${surahId}`);
+                    if (!response.ok) throw new Error('حدث خطأ في الاتصال بالخادم');
+                    
+                    const data = await response.json();
+                    if (data.verses) {
+                        let content = `<div class="surah-title">سورة ${data.name}</div>`;
+                        content += '<div class="verses">';
+                        data.verses.forEach(verse => {
+                            content += `
+                                <div class="verse">
+                                    <span class="verse-text">${verse.text}</span>
+                                    <span class="verse-number">${verse.number}</span>
+                                </div>`;
+                        });
+                        content += '</div>';
+                        quranContent.innerHTML = content;
+                    } else {
+                        showError(quranContent, 'عذراً، حدث خطأ في تحميل السورة');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showError(quranContent, 'حدث خطأ في الاتصال بالخادم. الرجاء المحاولة مرة أخرى.');
+                }
+            }
+
+            // تحديث دالة البحث في الحديث
+            async function searchHadith() {
+                if (!await checkServerStatus()) return;
+                
+                const searchText = document.getElementById('hadithSearch').value;
+                const hadithContent = document.getElementById('hadithContent');
+
+                if (!searchText.trim()) {
+                    hadithContent.innerHTML = '<p class="text-center">الرجاء إدخال نص للبحث</p>';
+                    return;
+                }
+
+                lastOperation = () => searchHadith();
+                hadithContent.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> جاري البحث...</div>';
+
+                try {
+                    const response = await fetch(`/api/hadith/search?q=${encodeURIComponent(searchText)}`);
+                    if (!response.ok) throw new Error('حدث خطأ في الاتصال بالخادم');
+                    
+                    const data = await response.json();
+                    if (data.results && data.results.length > 0) {
+                        let content = `<div class="search-results">`;
+                        content += `<h3 class="mb-4">نتائج البحث عن: "${searchText}"</h3>`;
+                        
+                        data.results.forEach(result => {
+                            content += `
+                                <div class="hadith-result mb-4">
+                                    <div class="hadith-book mb-2">${result.book_name}</div>
+                                    <div class="hadith-text">${result.text}</div>
+                                    <div class="hadith-reference">رقم الحديث: ${result.number}</div>
+                                </div>`;
+                        });
+                        content += '</div>';
+                        hadithContent.innerHTML = content;
+                    } else {
+                        hadithContent.innerHTML = `
+                            <div class="alert alert-info text-center" role="alert">
+                                <i class="fas fa-info-circle me-2"></i>
+                                لم يتم العثور على نتائج للبحث
+                            </div>`;
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showError(hadithContent, 'حدث خطأ في الاتصال بالخادم. الرجاء المحاولة مرة أخرى.');
+                }
+            }
+
+            // دالة تحميل قائمة السور
+            function loadSurahs() {
+                const surahSelect = document.getElementById('surahSelect');
+                const surahs = [
+                    'الفاتحة', 'البقرة', 'آل عمران', 'النساء', 'المائدة', 'الأنعام', 'الأعراف', 'الأنفال', 'التوبة', 'يونس',
+                    'هود', 'يوسف', 'الرعد', 'إبراهيم', 'الحجر', 'النحل', 'الإسراء', 'الكهف', 'مريم', 'طه',
+                    'الأنبياء', 'الحج', 'المؤمنون', 'النور', 'الفرقان', 'الشعراء', 'النمل', 'القصص', 'العنكبوت', 'الروم',
+                    'لقمان', 'السجدة', 'الأحزاب', 'سبأ', 'فاطر', 'يس', 'الصافات', 'ص', 'الزمر', 'غافر',
+                    'فصلت', 'الشورى', 'الزخرف', 'الدخان', 'الجاثية', 'الأحقاف', 'محمد', 'الفتح', 'الحجرات', 'ق',
+                    'الذاريات', 'الطور', 'النجم', 'القمر', 'الرحمن', 'الواقعة', 'الحديد', 'المجادلة', 'الحشر', 'الممتحنة',
+                    'الصف', 'الجمعة', 'المنافقون', 'التغابن', 'الطلاق', 'التحريم', 'الملك', 'القلم', 'الحاقة', 'المعارج',
+                    'نوح', 'الجن', 'المزمل', 'المدثر', 'القيامة', 'الإنسان', 'المرسلات', 'النبأ', 'النازعات', 'عبس',
+                    'التكوير', 'الانفطار', 'المطففين', 'الإنشقاق', 'البروج', 'الطارق', 'الأعلى', 'الغاشية', 'الفجر', 'البلد',
+                    'الشمس', 'الليل', 'الضحى', 'الشرح', 'التين', 'العلق', 'القدر', 'البينة', 'الزلزلة', 'العاديات',
+                    'القارعة', 'التكاثر', 'العصر', 'الهمزة', 'الفيل', 'قريش', 'الماعون', 'الكوثر', 'الكافرون', 'النصر',
+                    'المسد', 'الإخلاص', 'الفلق', 'الناس'
+                ];
+
+                // إضافة خيار افتراضي
+                surahSelect.innerHTML = '<option value="">اختر السورة...</option>';
+
+                // إضافة جميع السور
+                surahs.forEach((surah, index) => {
+                    const option = document.createElement('option');
+                    option.value = index + 1; // رقم السورة (يبدأ من 1)
+                    option.textContent = `سورة ${surah}`;
+                    surahSelect.appendChild(option);
+                });
+            }
+
+            // دالة تحميل كتب الحديث
+            function loadHadithBooks() {
+                const bookSelect = document.getElementById('bookSelect');
+                // هنا سيتم إضافة كود تحميل قائمة الكتب
+            }
+
+            // دالة لعرض القرآن الكريم
+            function showQuran() {
+                const modal = new bootstrap.Modal(document.getElementById('quranModal'));
+                modal.show();
+                loadSurahs(); // تحميل قائمة السور
+            }
+
+            // دالة لعرض السنة النبوية
+            function showSunnah() {
+                const modal = new bootstrap.Modal(document.getElementById('sunnahModal'));
+                modal.show();
+                loadHadithBooks(); // تحميل قائمة الكتب
+            }
+
+            // التحقق من حالة الخادم عند تحميل الصفحة
+            document.addEventListener('DOMContentLoaded', checkServerStatus);
+        </script>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="scholarModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle"></h5>
+                    <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
