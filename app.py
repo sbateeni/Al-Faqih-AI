@@ -20,8 +20,9 @@ def create_app():
     """إنشاء وتهيئة تطبيق Flask"""
     app = Flask(__name__)
     
-    # تحميل الإعدادات
+    # تحميل وتحقق من الإعدادات
     app.config.from_object(Config)
+    Config.validate_config()
     
     # تهيئة التخزين المؤقت
     cache = Cache(app, config={
@@ -40,6 +41,8 @@ def create_app():
         active_key_record = APIKey.query.filter_by(is_active=True).first()
         if active_key_record:
             active_key = active_key_record.key
+        elif Config.GEMINI_API_KEY:  # استخدام المفتاح من متغيرات البيئة إذا كان متوفراً
+            active_key = Config.GEMINI_API_KEY
     
     gemini = GeminiHelper.get_instance()
     if active_key and not gemini.setup_api(active_key):
@@ -55,6 +58,7 @@ def create_app():
     
     return app
 
+app = create_app()  # إنشاء نسخة من التطبيق للاستخدام مع gunicorn
+
 if __name__ == '__main__':
-    app = create_app()
     app.run(debug=True) 
