@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: al-faqih-ai
+    env: python
+    buildCommand: ./build.sh
+    startCommand: gunicorn app:create_app()
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: GOOGLE_API_KEY
+        sync: false
+    healthCheckPath: /
+    autoDeploy: true 

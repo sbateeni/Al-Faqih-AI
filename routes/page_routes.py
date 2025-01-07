@@ -69,3 +69,7 @@ def ask_fatwa():
         print("تفاصيل الخطأ:")
         print(traceback.format_exc())
         return jsonify({'error': f'حدث خطأ في معالجة الطلب: {str(e)}'}), 500 
+
+@page_bp.route('/settings/api')
+def api_settings():
+    return render_template('api_key_settings.html') 
