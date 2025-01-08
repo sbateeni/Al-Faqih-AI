@@ -77,9 +77,28 @@ def chat():
         if not scholar:
             return jsonify({'error': 'الرجاء اختيار العالم'}), 400
 
+        #�نشاء البرومبت المناسب للعالم
+        prompt = Prompts.get_individual_chat_prompt(scholar, message)
+        
         # محاولة الحصول على الرد
         try:
-            response = gemini.get_response(message)
+            response = gemini.get_response(prompt)
+            
+            # حفظ المحادثة في قاعدة البيانات
+            try:
+                new_chat = Chat(
+                    question=message,
+                    answer=response,
+                    chat_type='individual',
+                    scholar=scholar
+                )
+                db.session.add(new_chat)
+                db.session.commit()
+            except Exception as db_error:
+                logger.error(f"Database error: {str(db_error)}")
+                # نستمر حتى لو فشل الحفظ
+                pass
+                
             return jsonify({'response': response})
         except Exception as e:
             return handle_api_error(e)
@@ -138,38 +157,36 @@ def ask_chat():
         logger.error(f"Chat error: {str(e)}\n{traceback.format_exc()}")
         return handle_api_error(e)
 
-@chat_bp.route('/fatwa/ask', methods=['POST'])
+@chat_bp.route('/fatwa', methods=['POST'])
 def ask_fatwa():
     """معالجة طلبات الفتوى"""
     try:
-        logger.info("Received fatwa request")
-        
+        # التحقق من الاتصال أولاً
+        is_connected, error = gemini.check_connection()
+        if not is_connected:
+            return jsonify({
+                'error': 'خطأ في الاتصال',
+                'details': error
+            }), 503
+            
         data = request.get_json()
-        logger.info(f"Request data: {data}")
-        
-        question = data.get('question', '')
-        scholars = data.get('scholars', [])
+        question = data.get('question')
+        scholar = data.get('scholar', 'all')
         
         if not question:
             return jsonify({
-                'error': 'لم يتم تقديم سؤال',
+                'error': 'الرجاء إدخال السؤال',
                 'details': 'يجب تقديم سؤال للحصول على فتوى'
             }), 400
 
-        if not scholars:
-            return jsonify({
-                'error': 'لم يتم تحديد العلماء',
-                'details': 'يجب تحديد عالم واحد على الأقل'
-            }), 400
-
-        responses = {}
-        for scholar in scholars:
-            logger.info(f"Processing fatwa for scholar: {scholar}")
-            prompt = Prompts.get_fatwa_prompt(scholar, question)
+        # إنشاء البرومبت المناسب
+        prompt = Prompts.get_fatwa_prompt(scholar, question)
+        
+        # محاولة الحصول على الرد
+        try:
             response = gemini.get_response(prompt)
-            responses[scholar] = response
-
-            # حفظ كل فتوى في قاعدة البيانات
+            
+            # حفظ الفتوى في قاعدة البيانات
             try:
                 new_chat = Chat(
                     question=question,
@@ -178,75 +195,83 @@ def ask_fatwa():
                     scholar=scholar
                 )
                 db.session.add(new_chat)
+                db.session.commit()
             except Exception as db_error:
-                logger.error(f"Database error for scholar {scholar}: {str(db_error)}")
-                continue
-
-        try:
-            db.session.commit()
-            logger.info("All fatwas saved to database")
-        except Exception as db_error:
-            logger.error(f"Database commit error: {str(db_error)}\n{traceback.format_exc()}")
-            # نستمر حتى لو فشل الحفظ في قاعدة البيانات
-            pass
-
-        return jsonify(responses)
+                logger.error(f"Database error: {str(db_error)}")
+                # نستمر حتى لو فشل الحفظ
+                pass
+                
+            return jsonify({'response': response})
+        except Exception as e:
+            return handle_api_error(e)
+            
     except Exception as e:
-        logger.error(f"Fatwa error: {str(e)}\n{traceback.format_exc()}")
         return handle_api_error(e)
 
-@chat_bp.route('/quran-sunnah/ask', methods=['POST'])
+@chat_bp.route('/quran-sunnah', methods=['POST'])
 def ask_quran_sunnah():
     """معالجة الاستفسارات حول القرآن والسنة"""
     try:
-        logger.info("Received Quran/Sunnah request")
-        
+        # التحقق من الاتصال أولاً
+        is_connected, error = gemini.check_connection()
+        if not is_connected:
+            return jsonify({
+                'error': 'خطأ في الاتصال',
+                'details': error
+            }), 503
+            
         data = request.get_json()
-        logger.info(f"Request data: {data}")
-        
-        question = data.get('question', '')
+        question = data.get('question')
+        type = data.get('type', 'both')  # quran, hadith, or both
         
         if not question:
             return jsonify({
-                'error': 'لم يتم تقديم سؤال',
+                'error': 'الرجاء إدخال السؤال',
                 'details': 'يجب تقديم سؤال للبحث في القرآن والسنة'
             }), 400
 
-        # الحصول على الإجابات من القرآن والحديث
-        logger.info("Processing Quran response")
-        quran_prompt = Prompts.get_quran_prompt(question)
-        quran_response = gemini.get_response(quran_prompt)
-
-        logger.info("Processing Hadith response")
-        hadith_prompt = Prompts.get_hadith_prompt(question)
-        hadith_response = gemini.get_response(hadith_prompt)
+        responses = {}
         
-        # حفظ الإجابات في قاعدة البيانات
-        try:
-            quran_chat = Chat(
-                question=question,
-                answer=quran_response,
-                chat_type='quran'
-            )
-            hadith_chat = Chat(
-                question=question,
-                answer=hadith_response,
-                chat_type='hadith'
-            )
+        # الحصول على الإجابة من القرآن إذا كان مطلوباً
+        if type in ['quran', 'both']:
+            quran_prompt = Prompts.get_quran_prompt(question)
+            responses['quran'] = gemini.get_response(quran_prompt)
             
-            db.session.add(quran_chat)
-            db.session.add(hadith_chat)
+            # حفظ في قاعدة البيانات
+            try:
+                new_chat = Chat(
+                    question=question,
+                    answer=responses['quran'],
+                    chat_type='quran'
+                )
+                db.session.add(new_chat)
+            except Exception as db_error:
+                logger.error(f"Database error (Quran): {str(db_error)}")
+
+        # الحصول على الإجابة من السنة إذا كان مطلوباً
+        if type in ['hadith', 'both']:
+            hadith_prompt = Prompts.get_hadith_prompt(question)
+            responses['hadith'] = gemini.get_response(hadith_prompt)
+            
+            # حفظ في قاعدة البيانات
+            try:
+                new_chat = Chat(
+                    question=question,
+                    answer=responses['hadith'],
+                    chat_type='hadith'
+                )
+                db.session.add(new_chat)
+            except Exception as db_error:
+                logger.error(f"Database error (Hadith): {str(db_error)}")
+
+        # حفظ التغييرات في قاعدة البيانات
+        try:
             db.session.commit()
-            logger.info("Responses saved to database")
         except Exception as db_error:
-            logger.error(f"Database error: {str(db_error)}\n{traceback.format_exc()}")
-            # نستمر حتى لو فشل الحفظ في قاعدة البيانات
+            logger.error(f"Database commit error: {str(db_error)}")
+            # نستمر حتى لو فشل الحفظ
             pass
-        
-        return jsonify({
-            'quran': quran_response,
-            'hadith': hadith_response
-        })
+                
+        return jsonify(responses)
     except Exception as e:
-        logger.error(f"Quran/Sunnah error: {str(e)}\n{traceback.format_exc()}")
         return handle_api_error(e) 
