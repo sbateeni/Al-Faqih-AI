@@ -55,54 +55,59 @@ def health_check():
             'message': str(e)
         }), 500
 
-@chat_bp.route('/chat', methods=['POST'])
+@chat_bp.route('/api/chat', methods=['POST'])
 def chat():
     """معالجة طلبات المحادثة"""
     try:
-        # التحقق من الاتصال أولاً
-        is_connected, error = gemini.check_connection()
-        if not is_connected:
-            return jsonify({
-                'error': 'خطأ في الاتصال',
-                'details': error
-            }), 503
-
         data = request.get_json()
         message = data.get('message')
-        scholar = data.get('scholar')
-        
+
         if not message:
             return jsonify({'error': 'الرجاء إدخال رسالة'}), 400
-            
-        if not scholar:
-            return jsonify({'error': 'الرجاء اختيار العالم'}), 400
 
-        #�نشاء البرومبت المناسب للعالم
-        prompt = Prompts.get_individual_chat_prompt(scholar, message)
+        # تحضير السياق للمحادثة
+        context = """أنت الفقيه AI، مساعد ذكي متخصص في الفقه الإسلامي والشريعة. 
+        مهمتك هي الإجابة على الأسئلة المتعلقة بالدين الإسلامي بدقة وموضوعية.
+        يجب أن تستند إجاباتك إلى القرآن الكريم والسنة النبوية وآراء العلماء المعتبرين.
+        قدم الإجابات بأسلوب واضح ومنظم، مع ذكر المصادر والأدلة."""
+
+        # الحصول على الرد من Gemini
+        response = gemini.get_response(context + "\n\n" + message)
+
+        # حفظ المحادثة في قاعدة البيانات
+        chat = Chat(
+            user_message=message,
+            ai_response=response,
+            timestamp=datetime.utcnow()
+        )
+        db.session.add(chat)
+        db.session.commit()
+
+        return jsonify({
+            'response': response,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+
+    except Exception as e:
+        return handle_api_error(e)
+
+@chat_bp.route('/api/chat/history', methods=['GET'])
+def get_chat_history():
+    """الحصول على تاريخ المحادثات"""
+    try:
+        # الحصول على آخر 10 محادثات
+        chats = Chat.query.order_by(Chat.timestamp.desc()).limit(10).all()
         
-        # محاولة الحصول على الرد
-        try:
-            response = gemini.get_response(prompt)
-            
-            # حفظ المحادثة في قاعدة البيانات
-            try:
-                new_chat = Chat(
-                    question=message,
-                    answer=response,
-                    chat_type='individual',
-                    scholar=scholar
-                )
-                db.session.add(new_chat)
-                db.session.commit()
-            except Exception as db_error:
-                logger.error(f"Database error: {str(db_error)}")
-                # نستمر حتى لو فشل الحفظ
-                pass
-                
-            return jsonify({'response': response})
-        except Exception as e:
-            return handle_api_error(e)
-            
+        history = []
+        for chat in chats:
+            history.append({
+                'user_message': chat.user_message,
+                'ai_response': chat.ai_response,
+                'timestamp': chat.timestamp.isoformat()
+            })
+        
+        return jsonify(history)
+
     except Exception as e:
         return handle_api_error(e)
 
