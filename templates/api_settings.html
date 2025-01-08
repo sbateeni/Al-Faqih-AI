@@ -22,15 +22,15 @@
                                 </button>
                             </div>
                             <small class="text-muted">
-                                سيتم تخزين مفتاحك بشكل آمن ومشفر. لن يتم مشاركته مع أي طرف ثالث.
+                                سيتم تخزين مفتاحك بشكل آمن. لن يتم مشاركته مع أي طرف ثالث.
                             </small>
                         </div>
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save me-2"></i>حفظ المفتاح
                             </button>
-                            <button type="button" class="btn btn-danger" id="deactivateKey">
-                                <i class="fas fa-trash me-2"></i>إلغاء تفعيل المفتاح
+                            <button type="button" class="btn btn-danger" id="deleteKey">
+                                <i class="fas fa-trash me-2"></i>حذف المفتاح
                             </button>
                         </div>
                     </form>
@@ -46,7 +46,7 @@
                     <ul class="list-unstyled">
                         <li class="mb-2">
                             <i class="fas fa-lock text-info me-2"></i>
-                            يتم تشفير مفتاحك باستخدام خوارزميات تشفير قوية
+                            يتم تخزين مفتاحك بشكل آمن
                         </li>
                         <li class="mb-2">
                             <i class="fas fa-shield-alt text-info me-2"></i>
@@ -54,7 +54,7 @@
                         </li>
                         <li class="mb-2">
                             <i class="fas fa-history text-info me-2"></i>
-                            يمكنك تغيير أو إلغاء تفعيل مفتاحك في أي وقت
+                            يمكنك تغيير أو حذف مفتاحك في أي وقت
                         </li>
                     </ul>
                 </div>
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const apiKeyForm = document.getElementById('apiKeyForm');
     const apiKeyInput = document.getElementById('apiKey');
     const togglePassword = document.getElementById('togglePassword');
-    const deactivateKey = document.getElementById('deactivateKey');
+    const deleteKey = document.getElementById('deleteKey');
     const loadingOverlay = document.getElementById('loadingOverlay');
 
     // تبديل عرض/إخفاء كلمة المرور
@@ -87,6 +87,22 @@ document.addEventListener('DOMContentLoaded', function() {
         apiKeyInput.setAttribute('type', type);
         togglePassword.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
     });
+
+    // التحقق من حالة المفتاح عند تحميل الصفحة
+    async function checkApiKeyStatus() {
+        try {
+            const response = await fetch('/api-key/status');
+            const data = await response.json();
+            
+            if (data.has_active_key) {
+                showAlert('info', 'يوجد مفتاح API نشط');
+            }
+        } catch (error) {
+            console.error('Error checking API key status:', error);
+        }
+    }
+
+    checkApiKeyStatus();
 
     // حفظ مفتاح API
     apiKeyForm.addEventListener('submit', async function(e) {
@@ -124,9 +140,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // إلغاء تفعيل المفتاح
-    deactivateKey.addEventListener('click', async function() {
-        if (!confirm('هل أنت متأكد من رغبتك في إلغاء تفعيل المفتاح؟')) {
+    // حذف المفتاح
+    deleteKey.addEventListener('click', async function() {
+        if (!confirm('هل أنت متأكد من رغبتك في حذف المفتاح؟')) {
             return;
         }
 
@@ -140,10 +156,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             
             if (response.ok) {
-                showAlert('success', 'تم إلغاء تفعيل المفتاح بنجاح');
+                showAlert('success', 'تم حذف المفتاح بنجاح');
                 apiKeyInput.value = '';
             } else {
-                showAlert('error', data.error || 'حدث خطأ أثناء إلغاء تفعيل المفتاح');
+                showAlert('error', data.error || 'حدث خطأ أثناء حذف المفتاح');
             }
         } catch (error) {
             showAlert('error', 'حدث خطأ في الاتصال');
@@ -155,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // عرض التنبيهات
     function showAlert(type, message) {
         const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+        alertDiv.className = `alert alert-${type === 'success' ? 'success' : type === 'info' ? 'info' : 'danger'} alert-dismissible fade show`;
         alertDiv.innerHTML = `
             ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
