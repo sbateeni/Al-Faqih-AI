@@ -1,15 +1,13 @@
 from flask import Blueprint, request, jsonify, render_template
-from models.chat import Chat, db
-from models.fatwa import Fatwa
+from models.fatwa import Fatwa, db
 from utils.gemini_helper import GeminiHelper
-from utils.gemini import get_gemini_response
 from datetime import datetime
 
 fatwa_bp = Blueprint('fatwa', __name__)
 
 @fatwa_bp.route('/fatwa')
 def fatwa_page():
-    """عرض صفحة الفتوى"""
+    """صفحة الفتوى"""
     return render_template('fatwa.html')
 
 @fatwa_bp.route('/api/fatwa', methods=['POST'])
@@ -22,6 +20,11 @@ def get_fatwa():
         if not question:
             return jsonify({'error': 'الرجاء إدخال السؤال'}), 400
 
+        # تهيئة Gemini API
+        gemini = GeminiHelper.get_instance()
+        if not gemini.is_initialized():
+            return jsonify({'error': 'لم يتم تهيئة Gemini API. الرجاء إدخال مفتاح API صالح'}), 400
+
         # تحضير السياق للفتوى
         context = f"""أنت فقيه متخصص في الفقه الإسلامي. مهمتك هي الإجابة على الأسئلة الشرعية.
         يجب أن تقدم الفتوى بالتفصيل مع ذكر الأدلة من القرآن والسنة.
@@ -33,10 +36,15 @@ def get_fatwa():
         2. الأدلة من القرآن والسنة
         3. آراء المذاهب المختلفة
         4. الخلاصة والترجيح
-        5. التوصيات العملية"""
+        5. التوصيات العملية
+
+        السؤال: {question}"""
 
         # الحصول على الفتوى من Gemini
-        response = get_gemini_response(context + "\n\nالسؤال: " + question)
+        response = gemini.generate_text(context)
+
+        if not response:
+            return jsonify({'error': 'لم نتمكن من الحصول على إجابة. حاول مرة أخرى'}), 500
 
         # حفظ الفتوى في قاعدة البيانات
         fatwa = Fatwa(
@@ -45,7 +53,8 @@ def get_fatwa():
             madhahib=madhahib,
             timestamp=datetime.utcnow()
         )
-        fatwa.save()
+        db.session.add(fatwa)
+        db.session.commit()
 
         return jsonify({
             'response': response,
@@ -63,61 +72,9 @@ def get_recent_fatwas():
         
         recent_fatwas = []
         for fatwa in fatwas:
-            recent_fatwas.append({
-                'question': fatwa.question,
-                'answer': fatwa.answer,
-                'madhahib': fatwa.madhahib,
-                'timestamp': fatwa.timestamp.isoformat()
-            })
+            recent_fatwas.append(fatwa.to_dict())
         
         return jsonify(recent_fatwas)
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-def format_fatwa(response):
-    """تنسيق الفتوى لعرضها بشكل منظم"""
-    sections = []
-    current_section = {'title': '', 'content': []}
-    
-    for line in response.split('\n'):
-        line = line.strip()
-        if not line:
-            continue
-            
-        # التعرف على العناوين الرئيسية
-        if line.startswith(('الحكم:', 'الدليل:', 'المذاهب:', 'الخلاصة:', 'التوصيات:')):
-            if current_section['content']:
-                sections.append(current_section)
-            current_section = {'title': line, 'content': []}
-            continue
-            
-        # إضافة المحتوى
-        current_section['content'].append(line)
-    
-    if current_section['content']:
-        sections.append(current_section)
-    
-    # تنسيق النتائج النهائية
-    formatted_sections = []
-    for section in sections:
-        formatted_content = []
-        current_point = []
-        
-        for line in section['content']:
-            if line.startswith(('-', '•', '*')) or line[0].isdigit():
-                if current_point:
-                    formatted_content.append(' '.join(current_point))
-                current_point = [line]
-            else:
-                current_point.append(line)
-                
-        if current_point:
-            formatted_content.append(' '.join(current_point))
-            
-        formatted_sections.append({
-            'title': section['title'],
-            'content': '<br>'.join(formatted_content)
-        })
-    
-    return formatted_sections
