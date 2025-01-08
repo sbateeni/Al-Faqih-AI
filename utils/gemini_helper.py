@@ -104,20 +104,24 @@ class GeminiHelper:
             print("=== بداية طلب Gemini ===")
             print(f"طول البرومبت: {len(prompt)} حرف")
             
+            # التحقق من اتصال الإنترنت
+            if not self._check_internet_connection():
+                print("خطأ: لا يوجد اتصال بالإنترنت")
+                raise ConnectionError(self._last_error)
+            
+            # التحقق من تهيئة API
             if not self.is_initialized:
                 print("تهيئة نموذج Gemini...")
-                self.initialize_api()
-                
-            if not self.check_internet():
-                print("خطأ: لا يوجد اتصال بالإنترنت")
-                raise ConnectionError("لا يوجد اتصال بالإنترنت")
+                if not self.initialize_api():
+                    raise Exception(self._last_error or "فشل في تهيئة API")
                 
             print("جاري إرسال الطلب إلى Gemini...")
             response = self.model.generate_content(prompt)
             
             if not response or not response.text:
-                print("خطأ: لم يتم استلام رد من Gemini")
-                raise ValueError("لم يتم استلام رد من نموذج Gemini")
+                error_msg = "لم يتم استلام رد من نموذج Gemini"
+                print(f"خطأ: {error_msg}")
+                raise ValueError(error_msg)
                 
             print("تم استلام الرد بنجاح")
             print(f"طول الرد: {len(response.text)} حرف")
@@ -244,3 +248,25 @@ class GeminiHelper:
             print("تفاصيل الخطأ:")
             print(traceback.format_exc())
             raise Exception(f"حدث خطأ في الحصول على الفتوى: {str(e)}") 
+
+    def check_connection(self):
+        """التحقق من صحة الاتصال بشكل كامل"""
+        try:
+            # التحقق من اتصال الإنترنت
+            if not self._check_internet_connection():
+                return False, self._last_error
+            
+            # التحقق من وجود مفتاح API
+            if not self._check_api_key():
+                return False, self._last_error
+            
+            # التحقق من تهيئة API
+            if not self.is_initialized:
+                if not self.initialize_api():
+                    return False, self._last_error
+            
+            return True, None
+            
+        except Exception as e:
+            self._last_error = f"خطأ في التحقق من الاتصال: {str(e)}"
+            return False, self._last_error 

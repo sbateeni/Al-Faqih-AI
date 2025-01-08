@@ -55,31 +55,35 @@ def health_check():
             'message': str(e)
         }), 500
 
-@chat_bp.route('/chat/ask', methods=['POST'])
-def ask():
-    """معالجة الأسئلة العامة"""
+@chat_bp.route('/chat', methods=['POST'])
+def chat():
+    """معالجة طلبات المحادثة"""
     try:
-        data = request.get_json()
-        question = data.get('question', '')
-        
-        if not question:
+        # التحقق من الاتصال أولاً
+        is_connected, error = gemini.check_connection()
+        if not is_connected:
             return jsonify({
-                'error': 'لم يتم تقديم سؤال',
-                'details': 'يجب تقديم سؤال للحصول على إجابة'
-            }), 400
+                'error': 'خطأ في الاتصال',
+                'details': error
+            }), 503
 
-        response = gemini.get_response(question)
+        data = request.get_json()
+        message = data.get('message')
+        scholar = data.get('scholar')
         
-        # حفظ في قاعدة البيانات
-        new_chat = Chat(
-            question=question,
-            answer=response,
-            chat_type='general'
-        )
-        db.session.add(new_chat)
-        db.session.commit()
-        
-        return jsonify({'response': response})
+        if not message:
+            return jsonify({'error': 'الرجاء إدخال رسالة'}), 400
+            
+        if not scholar:
+            return jsonify({'error': 'الرجاء اختيار العالم'}), 400
+
+        # محاولة الحصول على الرد
+        try:
+            response = gemini.get_response(message)
+            return jsonify({'response': response})
+        except Exception as e:
+            return handle_api_error(e)
+            
     except Exception as e:
         return handle_api_error(e)
 
