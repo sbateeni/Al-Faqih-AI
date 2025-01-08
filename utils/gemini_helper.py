@@ -7,6 +7,12 @@ class GeminiHelper:
     _instance = None
     model = None
     _last_error = None
+    _is_initialized = False
+
+    @property
+    def is_initialized(self):
+        """التحقق من حالة التهيئة"""
+        return self._is_initialized
 
     @classmethod
     def get_instance(cls):
@@ -37,10 +43,12 @@ class GeminiHelper:
         try:
             # التحقق من اتصال الإنترنت أولاً
             if not self._check_internet_connection():
+                self._is_initialized = False
                 return False
 
             # التحقق من مفتاح API
             if not self._check_api_key():
+                self._is_initialized = False
                 return False
             
             # تهيئة الاتصال
@@ -51,23 +59,31 @@ class GeminiHelper:
             response = self.model.generate_content("اختبار الاتصال")
             if not response or not response.text:
                 self._last_error = "لم يتم تلقي استجابة من API. يرجى المحاولة مرة أخرى."
+                self._is_initialized = False
                 return False
                 
             self._last_error = None
+            self._is_initialized = True
             return True
 
         except genai.types.BlockedPromptException:
             self._last_error = "تم حظر المحتوى من قبل API. يرجى تعديل السؤال."
+            self._is_initialized = False
             return False
         except genai.types.GenerateContentException:
             self._last_error = "حدث خطأ في إنشاء المحتوى. يرجى المحاولة مرة أخرى."
+            self._is_initialized = False
             return False
         except Exception as e:
             self._last_error = f"خطأ غير متوقع: {str(e)}"
+            self._is_initialized = False
             return False
 
-    def setup_api(self):
+    def setup_api(self, api_key=None):
         """إعداد API مع إعادة المحاولة"""
+        if api_key:
+            Config.GEMINI_API_KEY = api_key
+            
         retry_count = 3
         while retry_count > 0:
             if self.initialize_api():
