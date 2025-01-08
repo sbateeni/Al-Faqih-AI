@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from models.chat import db, APIKey
 from utils.gemini_helper import GeminiHelper
+from config import Config
 
 api_key_bp = Blueprint('api_key', __name__)
 
@@ -40,3 +41,28 @@ def get_api_key_status():
         'has_active_key': active_key is not None,
         'last_updated': active_key.updated_at.isoformat() if active_key else None
     }) 
+
+@api_key_bp.route('/api-key', methods=['DELETE'])
+def delete_api_key():
+    """حذف مفتاح API الحالي"""
+    try:
+        # حذف جميع المفاتيح
+        APIKey.query.delete()
+        db.session.commit()
+        
+        # إعادة تهيئة GeminiHelper
+        gemini = GeminiHelper.get_instance()
+        gemini._is_initialized = False
+        gemini.model = None
+        Config.GEMINI_API_KEY = None
+        
+        return jsonify({
+            'message': 'تم حذف مفتاح API بنجاح',
+            'status': 'success'
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'error': 'حدث خطأ أثناء حذف المفتاح',
+            'details': str(e)
+        }), 500 
