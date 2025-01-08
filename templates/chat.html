@@ -78,8 +78,12 @@
                     </button>
                 </div>
                 <div class="card-body">
-                    <div id="chatMessages" class="chat-messages mb-4" style="height: 400px; overflow-y: auto;">
-                        <!-- Messages will be displayed here -->
+                    <div id="chatMessages" class="chat-container mb-4">
+                        <div class="chat-message">
+                            <div class="response-text">
+                                <!-- Chat messages will be inserted here -->
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Message Input -->
@@ -100,298 +104,327 @@
 </div>
 
 <style>
-.chat-messages {
-    padding: 1rem;
-    background: #f8f9fa;
-    border-radius: 10px;
-}
-
-.message {
-    margin-bottom: 1rem;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: messageAppear 0.5s ease forwards;
-}
-
-@keyframes messageAppear {
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    .chat-messages {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 10px;
     }
-}
 
-.message-user {
-    display: flex;
-    justify-content: flex-end;
-}
+    .message {
+        margin-bottom: 1rem;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: messageAppear 0.5s ease forwards;
+    }
 
-.message-scholar {
-    display: flex;
-    justify-content: flex-start;
-}
+    @keyframes messageAppear {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
-.message-content {
-    max-width: 80%;
-    padding: 1rem;
-    border-radius: 15px;
-    position: relative;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
+    .message-user {
+        display: flex;
+        justify-content: flex-end;
+    }
 
-.message-user .message-content {
-    background: var(--accent-color);
-    color: white;
-    border-bottom-right-radius: 5px;
-}
+    .message-scholar {
+        display: flex;
+        justify-content: flex-start;
+    }
 
-.message-scholar .message-content {
-    background: white;
-    border-bottom-left-radius: 5px;
-}
+    .message-content {
+        max-width: 80%;
+        padding: 1rem;
+        border-radius: 15px;
+        position: relative;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
 
-.message-time {
-    font-size: 0.8rem;
-    color: #6c757d;
-    margin-top: 0.5rem;
-    text-align: center;
-}
+    .message-user .message-content {
+        background: var(--accent-color);
+        color: white;
+        border-bottom-right-radius: 5px;
+    }
 
-.typing-indicator {
-    display: flex;
-    padding: 0.5rem;
-    background: white;
-    border-radius: 10px;
-    width: fit-content;
-}
+    .message-scholar .message-content {
+        background: white;
+        border-bottom-left-radius: 5px;
+    }
 
-.typing-dot {
-    width: 8px;
-    height: 8px;
-    margin: 0 2px;
-    background: var(--accent-color);
-    border-radius: 50%;
-    animation: typingAnimation 1s infinite ease-in-out;
-}
+    .message-time {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+        text-align: center;
+    }
 
-.typing-dot:nth-child(1) { animation-delay: 0.2s; }
-.typing-dot:nth-child(2) { animation-delay: 0.3s; }
-.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    .typing-indicator {
+        display: flex;
+        padding: 0.5rem;
+        background: white;
+        border-radius: 10px;
+        width: fit-content;
+    }
 
-@keyframes typingAnimation {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        margin: 0 2px;
+        background: var(--accent-color);
+        border-radius: 50%;
+        animation: typingAnimation 1s infinite ease-in-out;
+    }
 
-.scholar-info {
-    transition: all 0.3s ease;
-}
+    .typing-dot:nth-child(1) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(2) { animation-delay: 0.3s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
-#chatHistory .list-group-item {
-    border: none;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-    padding: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
+    @keyframes typingAnimation {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
 
-#chatHistory .list-group-item:hover {
-    background: rgba(52, 152, 219, 0.1);
-}
+    .scholar-info {
+        transition: all 0.3s ease;
+    }
 
-#chatHistory .list-group-item:last-child {
-    border-bottom: none;
-}
+    #chatHistory .list-group-item {
+        border: none;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    #chatHistory .list-group-item:hover {
+        background: rgba(52, 152, 219, 0.1);
+    }
+
+    #chatHistory .list-group-item:last-child {
+        border-bottom: none;
+    }
+
+    .chat-message {
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+        text-align: right;
+    }
+    .chat-message p {
+        margin-bottom: 1rem;
+        text-align: justify;
+    }
+    .chat-message ol {
+        padding-right: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .chat-message li {
+        margin-bottom: 0.5rem;
+    }
+    .chat-message .response-text {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .user-message .response-text {
+        background-color: #e3f2fd;
+    }
+    .ai-message .response-text {
+        background-color: #f8f9fa;
+    }
 </style>
 
 <script>
-const scholarInfo = {
-    'abu-hanifa': {
-        name: 'الإمام أبو حنيفة النعمان بن ثابت',
-        info: 'إمام المذهب الحنفي ومؤسس مدرسة الرأي في الفقه الإسلامي (80-150 هـ)'
-    },
-    'malik': {
-        name: 'الإمام مالك بن أنس بن مالك الأصبحي',
-        info: 'إمام دار الهجرة وصاحب المذهب المالكي (93-179 هـ)'
-    },
-    'shafii': {
-        name: 'الإمام محمد بن إدريس الشافعي',
-        info: 'مؤسس علم أصول الفقه وصاحب المذهب الشافعي (150-204 هـ)'
-    },
-    'ahmad': {
-        name: 'الإمام أحمد بن محمد بن حنبل الشيباني',
-        info: 'إمام أهل السنة وصاحب المذهب الحنبلي (164-241 هـ)'
-    },
-    'bukhari': {
-        name: 'الإمام محمد بن إسماعيل البخاري',
-        info: 'صاحب الجامع الصحيح (صحيح البخاري) (194-256 هـ)'
-    },
-    'muslim': {
-        name: 'الإمام مسلم بن الحجاج النيسابوري',
-        info: 'صاحب المسند الصحيح (صحيح مسلم) (204-261 هـ)'
-    },
-    'tirmidhi': {
-        name: 'الإمام محمد بن عيسى الترمذي',
-        info: 'صاحب الجامع (سنن الترمذي) (209-279 هـ)'
-    },
-    'nasai': {
-        name: 'الإمام أحمد بن شعيب النسائي',
-        info: 'صاحب السنن الكبرى والصغرى (215-303 هـ)'
-    },
-    'ibn-majah': {
-        name: 'الإمام محمد بن يزيد بن ماجه القزويني',
-        info: 'صاحب السنن (سنن ابن ماجه) (209-273 هـ)'
-    },
-    'abu-dawood': {
-        name: 'الإمام سليمان بن الأشعث السجستاني',
-        info: 'صاحب السنن (سنن أبي داود) (202-275 هـ)'
-    },
-    'ghazali': {
-        name: 'الإمام أبو حامد محمد الغزالي',
-        info: 'حجة الإسلام وصاحب إحياء علوم الدين (450-505 هـ)'
-    },
-    'nawawi': {
-        name: 'الإمام يحيى بن شرف النووي',
-        info: 'صاحب رياض الصالحين والأربعين النووية (631-676 هـ)'
-    },
-    'ibn-taymiyyah': {
-        name: 'الإمام أحمد بن عبد الحليم بن تيمية',
-        info: 'شيخ الإسلام وصاحب مجموع الفتاوى (661-728 هـ)'
-    },
-    'ibn-kathir': {
-        name: 'الإمام إسماعيل بن عمر بن كثير',
-        info: 'صاحب تفسير القرآن العظيم والبداية والنهاية (700-774 هـ)'
-    }
-};
-
-document.addEventListener('DOMContentLoaded', function() {
-    // تحديث معلومات العالم عند تغيير الاختيار
-    document.getElementById('scholarSelect').addEventListener('change', function() {
-        const scholar = scholarInfo[this.value];
-        document.getElementById('scholarName').textContent = scholar.name;
-        document.getElementById('scholarInfo').textContent = scholar.info;
-    });
-
-    // معالجة إرسال الرسالة
-    document.getElementById('messageForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const messageInput = document.getElementById('messageInput');
-        const message = messageInput.value.trim();
-        
-        if (message) {
-            addMessage(message, 'user');
-            messageInput.value = '';
-            showTypingIndicator();
-            
-            // إرسال الرسالة إلى الخادم
-            const scholar = document.getElementById('scholarSelect').value;
-            fetch('/api/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message: message,
-                    scholar: scholar
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                hideTypingIndicator();
-                if (data.error) {
-                    showError(data.error);
-                } else {
-                    addMessage(data.response, 'scholar');
-                    updateChatHistory(message, data.response);
-                }
-            })
-            .catch(error => {
-                hideTypingIndicator();
-                showError('حدث خطأ في الاتصال');
-            });
+    const scholarInfo = {
+        'abu-hanifa': {
+            name: 'الإمام أبو حنيفة النعمان بن ثابت',
+            info: 'إمام المذهب الحنفي ومؤسس مدرسة الرأي في الفقه الإسلامي (80-150 هـ)'
+        },
+        'malik': {
+            name: 'الإمام مالك بن أنس بن مالك الأصبحي',
+            info: 'إمام دار الهجرة وصاحب المذهب المالكي (93-179 هـ)'
+        },
+        'shafii': {
+            name: 'الإمام محمد بن إدريس الشافعي',
+            info: 'مؤسس علم أصول الفقه وصاحب المذهب الشافعي (150-204 هـ)'
+        },
+        'ahmad': {
+            name: 'الإمام أحمد بن محمد بن حنبل الشيباني',
+            info: 'إمام أهل السنة وصاحب المذهب الحنبلي (164-241 هـ)'
+        },
+        'bukhari': {
+            name: 'الإمام محمد بن إسماعيل البخاري',
+            info: 'صاحب الجامع الصحيح (صحيح البخاري) (194-256 هـ)'
+        },
+        'muslim': {
+            name: 'الإمام مسلم بن الحجاج النيسابوري',
+            info: 'صاحب المسند الصحيح (صحيح مسلم) (204-261 هـ)'
+        },
+        'tirmidhi': {
+            name: 'الإمام محمد بن عيسى الترمذي',
+            info: 'صاحب الجامع (سنن الترمذي) (209-279 هـ)'
+        },
+        'nasai': {
+            name: 'الإمام أحمد بن شعيب النسائي',
+            info: 'صاحب السنن الكبرى والصغرى (215-303 هـ)'
+        },
+        'ibn-majah': {
+            name: 'الإمام محمد بن يزيد بن ماجه القزويني',
+            info: 'صاحب السنن (سنن ابن ماجه) (209-273 هـ)'
+        },
+        'abu-dawood': {
+            name: 'الإمام سليمان بن الأشعث السجستاني',
+            info: 'صاحب السنن (سنن أبي داود) (202-275 هـ)'
+        },
+        'ghazali': {
+            name: 'الإمام أبو حامد محمد الغزالي',
+            info: 'حجة الإسلام وصاحب إحياء علوم الدين (450-505 هـ)'
+        },
+        'nawawi': {
+            name: 'الإمام يحيى بن شرف النووي',
+            info: 'صاحب رياض الصالحين والأربعين النووية (631-676 هـ)'
+        },
+        'ibn-taymiyyah': {
+            name: 'الإمام أحمد بن عبد الحليم بن تيمية',
+            info: 'شيخ الإسلام وصاحب مجموع الفتاوى (661-728 هـ)'
+        },
+        'ibn-kathir': {
+            name: 'الإمام إسماعيل بن عمر بن كثير',
+            info: 'صاحب تفسير القرآن العظيم والبداية والنهاية (700-774 هـ)'
         }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // تحديث معلومات العالم عند تغيير الاختيار
+        document.getElementById('scholarSelect').addEventListener('change', function() {
+            const scholar = scholarInfo[this.value];
+            document.getElementById('scholarName').textContent = scholar.name;
+            document.getElementById('scholarInfo').textContent = scholar.info;
+        });
+
+        // معالجة إرسال الرسالة
+        document.getElementById('messageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (message) {
+                addMessage(message, 'user');
+                messageInput.value = '';
+                showTypingIndicator();
+                
+                // إرسال الرسالة إلى الخادم
+                const scholar = document.getElementById('scholarSelect').value;
+                fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        scholar: scholar
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    hideTypingIndicator();
+                    if (data.error) {
+                        showError(data.error);
+                    } else {
+                        addMessage(data.response, 'scholar');
+                        updateChatHistory(message, data.response);
+                    }
+                })
+                .catch(error => {
+                    hideTypingIndicator();
+                    showError('حدث خطأ في الاتصال');
+                });
+            }
+        });
     });
-});
 
-function addMessage(text, type) {
-    const chatMessages = document.getElementById('chatMessages');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message message-${type}`;
-    
-    const content = document.createElement('div');
-    content.className = 'message-content';
-    content.textContent = text;
-    
-    const time = document.createElement('div');
-    time.className = 'message-time';
-    time.textContent = new Date().toLocaleTimeString();
-    
-    messageDiv.appendChild(content);
-    messageDiv.appendChild(time);
-    chatMessages.appendChild(messageDiv);
-    
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function showTypingIndicator() {
-    const chatMessages = document.getElementById('chatMessages');
-    const typingDiv = document.createElement('div');
-    typingDiv.className = 'message message-scholar';
-    typingDiv.id = 'typingIndicator';
-    
-    typingDiv.innerHTML = `
-        <div class="typing-indicator">
-            <div class="typing-dot"></div>
-            <div class="typing-dot"></div>
-            <div class="typing-dot"></div>
-        </div>
-    `;
-    
-    chatMessages.appendChild(typingDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function hideTypingIndicator() {
-    const typingIndicator = document.getElementById('typingIndicator');
-    if (typingIndicator) {
-        typingIndicator.remove();
+    function addMessage(text, type) {
+        const chatMessages = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message message-${type}`;
+        
+        const content = document.createElement('div');
+        content.className = 'message-content';
+        content.textContent = text;
+        
+        const time = document.createElement('div');
+        time.className = 'message-time';
+        time.textContent = new Date().toLocaleTimeString();
+        
+        messageDiv.appendChild(content);
+        messageDiv.appendChild(time);
+        chatMessages.appendChild(messageDiv);
+        
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-}
 
-function showError(message) {
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'alert alert-danger';
-    errorDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${message}`;
-    
-    const chatMessages = document.getElementById('chatMessages');
-    chatMessages.appendChild(errorDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-    
-    setTimeout(() => errorDiv.remove(), 5000);
-}
-
-function updateChatHistory(question, answer) {
-    const chatHistory = document.getElementById('chatHistory');
-    const historyItem = document.createElement('a');
-    historyItem.className = 'list-group-item';
-    historyItem.innerHTML = `
-        <div class="d-flex justify-content-between align-items-center">
-            <div class="text-truncate">${question}</div>
-            <small class="text-muted">${new Date().toLocaleTimeString()}</small>
-        </div>
-    `;
-    
-    historyItem.addEventListener('click', () => {
-        addMessage(question, 'user');
-        addMessage(answer, 'scholar');
-    });
-    
-    chatHistory.insertBefore(historyItem, chatHistory.firstChild);
-}
-
-function clearChat() {
-    if (confirm('هل أنت متأكد من رغبتك في مسح المحادثة؟')) {
-        document.getElementById('chatMessages').innerHTML = '';
+    function showTypingIndicator() {
+        const chatMessages = document.getElementById('chatMessages');
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message message-scholar';
+        typingDiv.id = 'typingIndicator';
+        
+        typingDiv.innerHTML = `
+            <div class="typing-indicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        `;
+        
+        chatMessages.appendChild(typingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-}
+
+    function hideTypingIndicator() {
+        const typingIndicator = document.getElementById('typingIndicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+    }
+
+    function showError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'alert alert-danger';
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${message}`;
+        
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.appendChild(errorDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        setTimeout(() => errorDiv.remove(), 5000);
+    }
+
+    function updateChatHistory(question, answer) {
+        const chatHistory = document.getElementById('chatHistory');
+        const historyItem = document.createElement('a');
+        historyItem.className = 'list-group-item';
+        historyItem.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-truncate">${question}</div>
+                <small class="text-muted">${new Date().toLocaleTimeString()}</small>
+            </div>
+        `;
+        
+        historyItem.addEventListener('click', () => {
+            addMessage(question, 'user');
+            addMessage(answer, 'scholar');
+        });
+        
+        chatHistory.insertBefore(historyItem, chatHistory.firstChild);
+    }
+
+    function clearChat() {
+        if (confirm('هل أنت متأكد من رغبتك في مسح المحادثة؟')) {
+            document.getElementById('chatMessages').innerHTML = '';
+        }
+    }
 </script>
-{% endblock %} 
+{% endblock %}

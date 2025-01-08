@@ -4,7 +4,7 @@ import sys
 # إضافة المجلد الحالي إلى مسار Python
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from flask import Flask
+from flask import Flask, render_template, request, jsonify
 from config.config import Config
 from models.chat import APIKey, db
 from utils.gemini_helper import GeminiHelper
@@ -15,6 +15,7 @@ from routes.history_routes import history_bp
 from routes.comments_routes import comments_bp
 from routes.api_key_routes import api_key_bp
 from flask_caching import Cache
+from inheritance_calculator import InheritanceCalculator
 
 def create_app():
     """إنشاء وتهيئة تطبيق Flask"""
@@ -55,7 +56,21 @@ def create_app():
     app.register_blueprint(history_bp, url_prefix='/api')
     app.register_blueprint(comments_bp, url_prefix='/api')
     app.register_blueprint(api_key_bp, url_prefix='/api')
-    
+
+    @app.route('/inheritance')
+    def inheritance():
+        return render_template('inheritance.html')
+
+    @app.route('/api/inheritance', methods=['POST'])
+    def calculate_inheritance():
+        try:
+            data = request.get_json()
+            calculator = InheritanceCalculator()
+            result = calculator.calculate_shares(data)
+            return jsonify(result)
+        except Exception as e:
+            return jsonify({'error': str(e)}), 400
+
     return app
 
 app = create_app()  # إنشاء نسخة من التطبيق للاستخدام مع gunicorn

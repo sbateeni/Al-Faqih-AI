@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-calculator me-2"></i>
+                        حاسبة المواريث الإسلامية
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form id="inheritanceForm">
+                        <!-- المتوفى -->
+                        <div class="mb-4">
+                            <label class="form-label">المتوفى</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="deceased" value="male" id="male" checked>
+                                <label class="form-check-label" for="male">ذكر</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="deceased" value="female" id="female">
+                                <label class="form-check-label" for="female">أنثى</label>
+                            </div>
+                        </div>
+
+                        <!-- التركة -->
+                        <div class="mb-4">
+                            <label class="form-label">قيمة التركة</label>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="estate_usd" placeholder="0" step="0.01">
+                                        <span class="input-group-text">دولار أمريكي</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="estate_ils" placeholder="0" step="0.01">
+                                        <span class="input-group-text">شيكل</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="estate_jod" placeholder="0" step="0.01">
+                                        <span class="input-group-text">دينار أردني</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <small class="text-muted mt-2 d-block">يمكنك إدخال القيمة بأي من العملات المتاحة</small>
+                        </div>
+
+                        <!-- الورثة -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">الورثة</h5>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="sons" class="form-label">عدد الأبناء</label>
+                                    <input type="number" class="form-control" id="sons" min="0" value="0">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="daughters" class="form-label">عدد البنات</label>
+                                    <input type="number" class="form-control" id="daughters" min="0" value="0">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="wives" class="form-label">عدد الزوجات</label>
+                                    <input type="number" class="form-control" id="wives" min="0" max="4" value="0">
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check mt-4">
+                                        <input class="form-check-input" type="checkbox" id="father">
+                                        <label class="form-check-label" for="father">الأب</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check mt-4">
+                                        <input class="form-check-input" type="checkbox" id="mother">
+                                        <label class="form-check-label" for="mother">الأم</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check mt-4">
+                                        <input class="form-check-input" type="checkbox" id="husband">
+                                        <label class="form-check-label" for="husband">الزوج</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- المذهب -->
+                        <div class="mb-4">
+                            <label class="form-label">المذهب</label>
+                            <select class="form-select" id="madhab">
+                                <option value="all">جميع المذاهب</option>
+                                <option value="hanafi">المذهب الحنفي</option>
+                                <option value="maliki">المذهب المالكي</option>
+                                <option value="shafii">المذهب الشافعي</option>
+                                <option value="hanbali">المذهب الحنبلي</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-calculator me-2"></i>
+                            حساب المواريث
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- نتيجة الحساب -->
+        <div class="col-md-12">
+            <div id="inheritanceResult" class="inheritance-response" style="display: none;">
+                <div class="inheritance-content">
+                    <div id="resultContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .inheritance-response {
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+        text-align: right;
+    }
+    .inheritance-response p {
+        margin-bottom: 1rem;
+        text-align: justify;
+    }
+    .inheritance-response ol {
+        padding-right: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .inheritance-response li {
+        margin-bottom: 0.5rem;
+    }
+    .inheritance-content {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .share-section {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #dee2e6;
+    }
+    .madhab-details {
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: #e3f2fd;
+        border-radius: 8px;
+    }
+    .inheritance-table {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+    .inheritance-table th,
+    .inheritance-table td {
+        padding: 0.75rem;
+        text-align: center;
+        border: 1px solid #dee2e6;
+    }
+    .inheritance-table th {
+        background-color: #f8f9fa;
+    }
+    .reference {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inheritanceForm = document.getElementById('inheritanceForm');
+    const inheritanceResult = document.getElementById('inheritanceResult');
+    const resultContent = document.getElementById('resultContent');
+
+    // تحديث سعر الصرف (يمكن تحديثه من API خارجي)
+    const exchangeRates = {
+        USD: 1,
+        ILS: 3.7, // سعر صرف الشيكل مقابل الدولار
+        JOD: 0.71 // سعر صرف الدينار مقابل الدولار
+    };
+
+    // تحويل جميع القيم إلى الدولار
+    function convertToUSD() {
+        const usd = parseFloat(document.getElementById('estate_usd').value) || 0;
+        const ils = (parseFloat(document.getElementById('estate_ils').value) || 0) / exchangeRates.ILS;
+        const jod = (parseFloat(document.getElementById('estate_jod').value) || 0) / exchangeRates.JOD;
+        return usd + ils + jod;
+    }
+
+    inheritanceForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = {
+            deceased: document.querySelector('input[name="deceased"]:checked').value,
+            estate_usd: document.getElementById('estate_usd').value,
+            estate_ils: document.getElementById('estate_ils').value,
+            estate_jod: document.getElementById('estate_jod').value,
+            total_estate: convertToUSD(), // القيمة الإجمالية بالدولار
+            sons: document.getElementById('sons').value,
+            daughters: document.getElementById('daughters').value,
+            wives: document.getElementById('wives').value,
+            father: document.getElementById('father').checked,
+            mother: document.getElementById('mother').checked,
+            husband: document.getElementById('husband').checked,
+            madhab: document.getElementById('madhab').value
+        };
+
+        // التحقق من إدخال قيمة واحدة على الأقل
+        if (formData.estate_usd === '' && formData.estate_ils === '' && formData.estate_jod === '') {
+            showError('الرجاء إدخال قيمة التركة بإحدى العملات المتاحة');
+            return;
+        }
+
+        // Show loading
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.className = 'loading-overlay';
+        loadingOverlay.innerHTML = '<div class="loading-spinner"></div>';
+        document.body.appendChild(loadingOverlay);
+
+        try {
+            const response = await fetch('/api/inheritance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                showError(data.error);
+            } else {
+                resultContent.innerHTML = formatInheritanceResult(data, formData);
+                inheritanceResult.style.display = 'block';
+                inheritanceResult.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (error) {
+            showError('حدث خطأ في الاتصال');
+        } finally {
+            loadingOverlay.remove();
+        }
+    });
+});
+
+function formatInheritanceResult(data, formData) {
+    const { shares, total, explanation, madhabDetails } = data;
+    
+    // تحويل القيم إلى العملات المختلفة
+    function convertAmount(amount) {
+        return {
+            USD: amount.toFixed(2),
+            ILS: (amount * 3.7).toFixed(2),
+            JOD: (amount * 0.71).toFixed(2)
+        };
+    }
+    
+    let html = `
+        <h5 class="mb-3">نتيجة حساب المواريث</h5>
+        <div class="table-responsive">
+            <table class="inheritance-table">
+                <thead>
+                    <tr>
+                        <th>الوارث</th>
+                        <th>النصيب</th>
+                        <th>دولار أمريكي</th>
+                        <th>شيكل</th>
+                        <th>دينار أردني</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    // إضافة أنصبة الورثة
+    for (const [heir, share] of Object.entries(shares)) {
+        const amounts = convertAmount(share.amount);
+        html += `
+            <tr>
+                <td>${heir}</td>
+                <td>${share.percentage}</td>
+                <td>${amounts.USD} $</td>
+                <td>${amounts.ILS} ₪</td>
+                <td>${amounts.JOD} د.أ</td>
+            </tr>
+        `;
+    }
+
+    // إضافة الإجمالي
+    const totalAmounts = convertAmount(total);
+    html += `
+                </tbody>
+                <tfoot>
+                    <tr class="table-active">
+                        <td colspan="2"><strong>الإجمالي</strong></td>
+                        <td><strong>${totalAmounts.USD} $</strong></td>
+                        <td><strong>${totalAmounts.ILS} ₪</strong></td>
+                        <td><strong>${totalAmounts.JOD} د.أ</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    `;
+
+    // إضافة الشرح التفصيلي
+    if (explanation) {
+        html += `
+            <div class="mt-4">
+                <h6>الشرح التفصيلي:</h6>
+                <p>${explanation}</p>
+            </div>
+        `;
+    }
+
+    // إضافة تفاصيل المذاهب
+    if (madhabDetails) {
+        html += `
+            <div class="madhab-details">
+                <h6>آراء المذاهب:</h6>
+                ${madhabDetails}
+            </div>
+        `;
+    }
+
+    // إضافة أزرار المشاركة
+    html += `
+        <div class="share-section">
+            <button class="btn btn-outline-primary me-2" onclick="shareResult()">
+                <i class="fas fa-share-alt me-1"></i>
+                مشاركة
+            </button>
+            <button class="btn btn-outline-success" onclick="saveResult()">
+                <i class="fas fa-download me-1"></i>
+                حفظ
+            </button>
+        </div>
+    `;
+
+    return html;
+}
+
+function showError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'alert alert-danger mt-3';
+    errorDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${message}`;
+    
+    const form = document.getElementById('inheritanceForm');
+    form.insertAdjacentElement('afterend', errorDiv);
+    
+    setTimeout(() => errorDiv.remove(), 5000);
+}
+
+function shareResult() {
+    if (navigator.share) {
+        const resultText = document.getElementById('resultContent').textContent;
+        navigator.share({
+            title: 'نتيجة حساب المواريث',
+            text: resultText
+        }).catch(console.error);
+    } else {
+        alert('مشاركة النتيجة غير متاحة في متصفحك');
+    }
+}
+
+function saveResult() {
+    const resultText = document.getElementById('resultContent').textContent;
+    const blob = new Blob([resultText], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'inheritance_result.txt';
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+</script>
+{% endblock %}

@@ -73,12 +73,9 @@
                     <div class="feature-icon mb-3">
                         <i class="fas fa-comments fa-3x text-primary"></i>
                     </div>
-                    <h5 class="card-title mb-3">محادثة فردية</h5>
-                    <p class="card-text mb-4">تحدث مع العلماء بشكل فردي واحصل على إجابات مفصلة لأسئلتك</p>
-                    <a href="{{ url_for('pages.chat') }}" class="btn btn-primary w-100">
-                        <i class="fas fa-arrow-right me-2"></i>
-                        ابدأ المحادثة
-                    </a>
+                    <h5 class="card-title mb-3">المحادثة مع العلماء</h5>
+                    <p class="card-text">تحدث مع العلماء واحصل على إجابات لأسئلتك الدينية</p>
+                    <a href="/chat" class="btn btn-primary mt-3">ابدأ المحادثة</a>
                 </div>
             </div>
         </div>
@@ -86,14 +83,11 @@
             <div class="card h-100 shadow-lg">
                 <div class="card-body text-center p-4">
                     <div class="feature-icon mb-3">
-                        <i class="fas fa-book-open fa-3x text-success"></i>
+                        <i class="fas fa-scroll fa-3x text-primary"></i>
                     </div>
-                    <h5 class="card-title mb-3">فتوى</h5>
-                    <p class="card-text mb-4">احصل على الفتاوى من مختلف المذاهب الإسلامية بطريقة سهلة وسريعة</p>
-                    <a href="{{ url_for('pages.fatwa') }}" class="btn btn-success w-100">
-                        <i class="fas fa-arrow-right me-2"></i>
-                        اطلب فتوى
-                    </a>
+                    <h5 class="card-title mb-3">الفتاوى</h5>
+                    <p class="card-text">احصل على فتاوى شرعية موثوقة في مختلف المسائل</p>
+                    <a href="/fatwa" class="btn btn-primary mt-3">اطلب فتوى</a>
                 </div>
             </div>
         </div>
@@ -101,16 +95,58 @@
             <div class="card h-100 shadow-lg">
                 <div class="card-body text-center p-4">
                     <div class="feature-icon mb-3">
-                        <i class="fas fa-quran fa-3x text-info"></i>
+                        <i class="fas fa-book-open fa-3x text-primary"></i>
                     </div>
                     <h5 class="card-title mb-3">القرآن والسنة</h5>
-                    <p class="card-text mb-4">ابحث في القرآن الكريم والسنة النبوية واحصل على التفسير والشرح</p>
-                    <a href="{{ url_for('pages.quran_sunnah') }}" class="btn btn-info w-100">
-                        <i class="fas fa-arrow-right me-2"></i>
-                        ابدأ البحث
-                    </a>
+                    <p class="card-text">ابحث في القرآن الكريم والأحاديث النبوية الشريفة</p>
+                    <a href="/quran_sunnah" class="btn btn-primary mt-3">ابدأ البحث</a>
                 </div>
             </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-lg">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-calculator fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title mb-3">حاسبة المواريث</h5>
+                    <p class="card-text">احسب المواريث بدقة حسب المذاهب الأربعة مع شرح تفصيلي</p>
+                    <a href="/inheritance" class="btn btn-primary mt-3">احسب الميراث</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .chat-message {
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+        text-align: right;
+    }
+    .chat-message p {
+        margin-bottom: 1rem;
+        text-align: justify;
+    }
+    .chat-message ol {
+        padding-right: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .chat-message li {
+        margin-bottom: 0.5rem;
+    }
+    .chat-message .response-text {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
+
+<div id="chatMessages" class="chat-container mb-4">
+    <div class="chat-message">
+        <div class="response-text">
+            <!-- Chat messages will be inserted here -->
         </div>
     </div>
 </div>
@@ -221,4 +257,4 @@ function toggleApiKeyVisibility() {
     }
 }
 </script>
-{% endblock %} 
+{% endblock %}
