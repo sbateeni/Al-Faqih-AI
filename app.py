@@ -25,25 +25,29 @@ def create_app():
     app.config.from_object(Config)
     Config.validate_config()
     
+    # تهيئة قاعدة البيانات
+    db.init_app(app)
+    
     # تهيئة التخزين المؤقت
     cache = Cache(app, config={
         'CACHE_TYPE': 'simple',
         'CACHE_DEFAULT_TIMEOUT': 300
     })
     
-    # تهيئة قاعدة البيانات
-    db.init_app(app)
     with app.app_context():
+        # إنشاء جداول قاعدة البيانات
         db.create_all()
-    
-    # تهيئة Gemini API
-    active_key = None
-    with app.app_context():
-        active_key_record = APIKey.query.filter_by(is_active=True).first()
-        if active_key_record:
-            active_key = active_key_record.key
-        elif Config.GEMINI_API_KEY:  # استخدام المفتاح من متغيرات البيئة إذا كان متوفراً
-            active_key = Config.GEMINI_API_KEY
+        
+        # تهيئة Gemini API
+        active_key = None
+        try:
+            active_key_record = APIKey.query.filter_by(is_active=True).first()
+            if active_key_record:
+                active_key = active_key_record.key
+            elif Config.GEMINI_API_KEY:  # استخدام المفتاح من متغيرات البيئة إذا كان متوفراً
+                active_key = Config.GEMINI_API_KEY
+        except Exception as e:
+            print(f"خطأ في استرجاع مفتاح API: {str(e)}")
     
     gemini = GeminiHelper.get_instance()
     if active_key and not gemini.setup_api(active_key):
@@ -76,4 +80,4 @@ def create_app():
 app = create_app()  # إنشاء نسخة من التطبيق للاستخدام مع gunicorn
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=True)
