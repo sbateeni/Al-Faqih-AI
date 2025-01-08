@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from models.chat import db, APIKey
 from utils.gemini_helper import GeminiHelper
-from config import Config
+from config.config import Config
 
 api_key_bp = Blueprint('api_key', __name__)
 
