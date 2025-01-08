@@ -14,6 +14,7 @@ from routes.quran_sunnah_routes import quran_sunnah_bp
 from routes.history_routes import history_bp
 from routes.comments_routes import comments_bp
 from routes.api_key_routes import api_key_bp
+from routes.fatwa_routes import fatwa_bp
 from flask_caching import Cache
 from inheritance_calculator import InheritanceCalculator
 
@@ -60,6 +61,7 @@ def create_app():
     app.register_blueprint(history_bp, url_prefix='/api')
     app.register_blueprint(comments_bp, url_prefix='/api')
     app.register_blueprint(api_key_bp, url_prefix='/api')
+    app.register_blueprint(fatwa_bp, url_prefix='/api')
 
     @app.route('/inheritance')
     def inheritance():

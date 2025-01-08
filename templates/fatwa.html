@@ -1,335 +1,135 @@
 {% extends "base.html" %}
 
+{% block title %}الفتاوى الإسلامية{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
-    <!-- Hero Section -->
-    <div class="text-center mb-5">
-        <h1 class="display-4 mb-3">الفتوى</h1>
-        <p class="lead mb-4">احصل على الفتاوى من مختلف المذاهب الإسلامية بطريقة سهلة وسريعة</p>
-    </div>
-
-    <!-- Fatwa Form -->
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-lg">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-book-open me-2"></i>
-                        طلب فتوى
-                    </h5>
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">اسأل عن الفتوى</h5>
                 </div>
                 <div class="card-body">
                     <form id="fatwaForm">
-                        <!-- Question Input -->
-                        <div class="mb-4">
-                            <label for="questionInput" class="form-label">السؤال</label>
-                            <textarea id="questionInput" class="form-control" rows="4" 
-                                    placeholder="اكتب سؤالك الشرعي هنا..." required></textarea>
-                            <div class="form-text">
-                                <i class="fas fa-info-circle me-1"></i>
-                                يرجى كتابة السؤال بوضوح وتفصيل للحصول على فتوى دقيقة
-                            </div>
+                        <div class="mb-3">
+                            <label for="question" class="form-label">سؤالك</label>
+                            <textarea class="form-control" id="question" rows="3" 
+                                    placeholder="اكتب سؤالك هنا..." required></textarea>
                         </div>
-
-                        <!-- Madhab Selection -->
-                        <div class="mb-4">
-                            <label class="form-label">المذهب</label>
-                            <div class="row g-3">
-                                <div class="col-md-12 mb-3">
-                                    <div class="form-check custom-radio">
-                                        <input class="form-check-input" type="radio" name="madhab" 
-                                               id="all-madhabs" value="all" checked>
-                                        <label class="form-check-label" for="all-madhabs">
-                                            <i class="fas fa-mosque me-1"></i>
-                                            جميع المذاهب
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check custom-radio">
-                                        <input class="form-check-input" type="radio" name="madhab" 
-                                               id="hanafi" value="hanafi">
-                                        <label class="form-check-label" for="hanafi">
-                                            <i class="fas fa-mosque me-1"></i>
-                                            الحنفي
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check custom-radio">
-                                        <input class="form-check-input" type="radio" name="madhab" 
-                                               id="maliki" value="maliki">
-                                        <label class="form-check-label" for="maliki">
-                                            <i class="fas fa-mosque me-1"></i>
-                                            المالكي
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check custom-radio">
-                                        <input class="form-check-input" type="radio" name="madhab" 
-                                               id="shafii" value="shafii">
-                                        <label class="form-check-label" for="shafii">
-                                            <i class="fas fa-mosque me-1"></i>
-                                            الشافعي
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check custom-radio">
-                                        <input class="form-check-input" type="radio" name="madhab" 
-                                               id="hanbali" value="hanbali">
-                                        <label class="form-check-label" for="hanbali">
-                                            <i class="fas fa-mosque me-1"></i>
-                                            الحنبلي
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>إرسال السؤال
+                            </button>
                         </div>
-
-                        <!-- Submit Button -->
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-paper-plane me-2"></i>
-                            طلب الفتوى
-                        </button>
                     </form>
                 </div>
             </div>
 
-            <!-- Fatwa Response -->
-            <div id="fatwaResponse" class="fatwa-response">
-                <div class="fatwa-content">
-                    <div id="responseContent"></div>
-                    <div class="text-center mt-4">
-                        <button class="btn btn-outline-primary me-2" onclick="shareFatwa()">
-                            <i class="fas fa-share-alt me-1"></i>
-                            مشاركة
-                        </button>
-                        <button class="btn btn-outline-success" onclick="saveFatwa()">
-                            <i class="fas fa-save me-1"></i>
-                            حفظ
-                        </button>
-                    </div>
+            <!-- مساحة للإجابة -->
+            <div id="answerSection" class="card mt-4 shadow d-none">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">الإجابة</h5>
+                </div>
+                <div class="card-body">
+                    <div id="answer" class="answer-text"></div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<style>
-    .custom-radio {
-        padding: 1rem;
-        border: 2px solid #e9ecef;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-    }
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay d-none">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">جاري التحميل...</span>
+    </div>
+</div>
+{% endblock %}
 
-    .custom-radio:hover {
-        border-color: var(--accent-color);
-        background: rgba(52, 152, 219, 0.1);
-    }
-
-    .form-check-input:checked ~ .form-check-label {
-        color: var(--accent-color);
-        font-weight: 500;
-    }
-
-    .custom-radio .form-check-input:checked {
-        background-color: var(--accent-color);
-        border-color: var(--accent-color);
-    }
-
-    #responseContent {
-        font-size: 1.1rem;
-        line-height: 1.8;
-    }
-
-    #responseContent .fatwa-title {
-        font-size: 1.3rem;
-        font-weight: 600;
-        color: var(--primary-color);
-        margin-bottom: 1rem;
-    }
-
-    #responseContent .fatwa-text {
-        text-align: justify;
-        margin-bottom: 1.5rem;
-    }
-
-    #responseContent .fatwa-references {
-        font-size: 0.9rem;
-        color: #6c757d;
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 10px;
-        margin-top: 1.5rem;
-    }
-
-    .loading-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
-
-    .loading-spinner {
-        width: 4rem;
-        height: 4rem;
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid var(--accent-color);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    .fatwa-response {
-        margin-bottom: 1.5rem;
-        line-height: 1.6;
-        text-align: right;
-    }
-    .fatwa-response p {
-        margin-bottom: 1rem;
-        text-align: justify;
-    }
-    .fatwa-response ol {
-        padding-right: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    .fatwa-response li {
-        margin-bottom: 0.5rem;
-    }
-    .fatwa-content {
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .fatwa-references {
-        font-size: 0.9rem;
-        color: #6c757d;
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid #dee2e6;
-    }
-</style>
-
+{% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const fatwaForm = document.getElementById('fatwaForm');
-    const fatwaResponse = document.getElementById('fatwaResponse');
-    const responseContent = document.getElementById('responseContent');
+    const answerSection = document.getElementById('answerSection');
+    const answerDiv = document.getElementById('answer');
+    const loadingOverlay = document.getElementById('loadingOverlay');
 
     fatwaForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        const question = document.getElementById('questionInput').value.trim();
-        const madhab = document.querySelector('input[name="madhab"]:checked').value;
+        const question = document.getElementById('question').value.trim();
+        if (!question) {
+            showAlert('error', 'الرجاء إدخال سؤال');
+            return;
+        }
+
+        loadingOverlay.classList.remove('d-none');
         
-        if (!question) return;
-
-        // Show loading overlay
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.className = 'loading-overlay';
-        loadingOverlay.innerHTML = '<div class="loading-spinner"></div>';
-        document.body.appendChild(loadingOverlay);
-
         try {
             const response = await fetch('/api/fatwa', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    question: question,
-                    madhab: madhab
-                })
+                body: JSON.stringify({ question: question })
             });
 
             const data = await response.json();
-
-            if (data.error) {
-                showError(data.error);
+            
+            if (response.ok) {
+                answerDiv.innerHTML = data.answer.replace(/\n/g, '<br>');
+                answerSection.classList.remove('d-none');
+                window.scrollTo({
+                    top: answerSection.offsetTop,
+                    behavior: 'smooth'
+                });
             } else {
-                // Format and display the fatwa
-                responseContent.innerHTML = formatFatwa(data.response, madhab);
-                fatwaResponse.style.display = 'block';
-                fatwaResponse.scrollIntoView({ behavior: 'smooth' });
+                showAlert('error', data.error || 'حدث خطأ في معالجة طلبك');
             }
         } catch (error) {
-            showError('حدث خطأ في الاتصال');
+            showAlert('error', 'حدث خطأ في الاتصال');
         } finally {
-            loadingOverlay.remove();
+            loadingOverlay.classList.add('d-none');
         }
     });
-});
 
-function formatFatwa(text, madhab) {
-    const madhabInfo = {
-        all: 'جميع المذاهب',
-        hanafi: 'المذهب الحنفي',
-        maliki: 'المذهب المالكي',
-        shafii: 'المذهب الشافعي',
-        hanbali: 'المذهب الحنبلي'
-    };
-
-    return `
-        <div class="fatwa-title">
-            <i class="fas fa-quote-right me-2"></i>
-            ${madhab === 'all' ? 'الفتوى من جميع المذاهب' : `الفتوى حسب ${madhabInfo[madhab]}`}
-        </div>
-        <div class="fatwa-text">
-            ${text}
-        </div>
-        <div class="fatwa-references">
-            <i class="fas fa-book me-2"></i>
-            المراجع: ${madhab === 'all' ? 'كتب الفقه المعتمدة في المذاهب الأربعة' : `كتب الفقه المعتمدة في ${madhabInfo[madhab]}`}
-        </div>
-    `;
-}
-
-function showError(message) {
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'alert alert-danger mt-3';
-    errorDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${message}`;
-    
-    const form = document.getElementById('fatwaForm');
-    form.insertAdjacentElement('afterend', errorDiv);
-    
-    setTimeout(() => errorDiv.remove(), 5000);
-}
-
-function shareFatwa() {
-    if (navigator.share) {
-        const fatwaText = document.getElementById('responseContent').textContent;
-        navigator.share({
-            title: 'فتوى من الفقيه AI',
-            text: fatwaText
-        }).catch(console.error);
-    } else {
-        alert('مشاركة الفتوى غير متاحة في متصفحك');
+    // عرض التنبيهات
+    function showAlert(type, message) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        fatwaForm.insertAdjacentElement('beforebegin', alertDiv);
+        
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
     }
+});
+</script>
+
+<style>
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
 }
 
-function saveFatwa() {
-    const fatwaText = document.getElementById('responseContent').textContent;
-    const blob = new Blob([fatwaText], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'fatwa.txt';
-    a.click();
-    window.URL.revokeObjectURL(url);
+.answer-text {
+    text-align: right;
+    line-height: 1.6;
+    font-size: 1.1rem;
 }
-</script>
+</style>
 {% endblock %}

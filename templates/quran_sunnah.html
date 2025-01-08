@@ -1,354 +1,179 @@
 {% extends "base.html" %}
 
+{% block title %}البحث في القرآن والسنة{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
-    <!-- Hero Section -->
-    <div class="text-center mb-5">
-        <h1 class="display-4 mb-3">القرآن والسنة</h1>
-        <p class="lead mb-4">ابحث في القرآن الكريم والسنة النبوية واحصل على التفسير والشرح</p>
-    </div>
-
-    <!-- Search Form -->
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-lg">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-search me-2"></i>
-                        البحث في القرآن والسنة
-                    </h5>
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">البحث في القرآن والسنة</h5>
                 </div>
                 <div class="card-body">
                     <form id="searchForm">
-                        <!-- Search Input -->
-                        <div class="mb-4">
-                            <label for="searchInput" class="form-label">موضوع البحث</label>
-                            <textarea id="searchInput" class="form-control" rows="3" 
-                                    placeholder="اكتب موضوع البحث هنا..." required></textarea>
-                            <div class="form-text">
-                                <i class="fas fa-info-circle me-1"></i>
-                                يمكنك البحث عن آية، حديث، موضوع، أو سؤال محدد
-                            </div>
+                        <div class="mb-3">
+                            <label for="searchQuery" class="form-label">نص البحث</label>
+                            <textarea class="form-control" id="searchQuery" rows="3" 
+                                    placeholder="اكتب موضوع أو كلمة للبحث..." required></textarea>
                         </div>
-
-                        <!-- Search Options -->
-                        <div class="mb-4">
-                            <label class="form-label">نطاق البحث</label>
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <div class="form-check custom-checkbox">
-                                        <input class="form-check-input" type="checkbox" 
-                                               id="quran" value="quran" checked>
-                                        <label class="form-check-label" for="quran">
-                                            <i class="fas fa-quran me-1"></i>
-                                            القرآن الكريم
-                                        </label>
-                                    </div>
+                        <div class="mb-3">
+                            <label class="form-label">نوع البحث</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="searchType" 
+                                           id="bothType" value="both" checked>
+                                    <label class="form-check-label" for="bothType">
+                                        القرآن والسنة
+                                    </label>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="form-check custom-checkbox">
-                                        <input class="form-check-input" type="checkbox" 
-                                               id="hadith" value="hadith" checked>
-                                        <label class="form-check-label" for="hadith">
-                                            <i class="fas fa-book me-1"></i>
-                                            الحديث الشريف
-                                        </label>
-                                    </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="searchType" 
+                                           id="quranType" value="quran">
+                                    <label class="form-check-label" for="quranType">
+                                        القرآن فقط
+                                    </label>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="form-check custom-checkbox">
-                                        <input class="form-check-input" type="checkbox" 
-                                               id="tafsir" value="tafsir" checked>
-                                        <label class="form-check-label" for="tafsir">
-                                            <i class="fas fa-book-open me-1"></i>
-                                            التفسير
-                                        </label>
-                                    </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="searchType" 
+                                           id="hadithType" value="hadith">
+                                    <label class="form-check-label" for="hadithType">
+                                        الحديث فقط
+                                    </label>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Submit Button -->
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-search me-2"></i>
-                            بحث
-                        </button>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i>بحث
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Search Results -->
-            <div id="searchResults" class="quran-response" style="display: none;">
-                <div class="quran-content">
-                    <!-- نتائج البحث في القرآن -->
+            <!-- نتائج البحث -->
+            <div id="resultsSection" class="card mt-4 shadow d-none">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">نتائج البحث</h5>
                 </div>
-                <div class="hadith-content">
-                    <!-- نتائج البحث في السنة -->
+                <div class="card-body">
+                    <div id="searchResults" class="search-results"></div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<style>
-.custom-checkbox {
-    padding: 1rem;
-    border: 2px solid #e9ecef;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-}
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay d-none">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">جاري البحث...</span>
+    </div>
+</div>
+{% endblock %}
 
-.custom-checkbox:hover {
-    border-color: var(--accent-color);
-    background: rgba(52, 152, 219, 0.1);
-}
-
-.form-check-input:checked ~ .form-check-label {
-    color: var(--accent-color);
-    font-weight: 500;
-}
-
-.custom-checkbox .form-check-input:checked {
-    background-color: var(--accent-color);
-    border-color: var(--accent-color);
-}
-
-#resultsContent {
-    font-size: 1.1rem;
-    line-height: 1.8;
-}
-
-.result-item {
-    padding: 1.5rem;
-    border-bottom: 1px solid #e9ecef;
-    transition: all 0.3s ease;
-}
-
-.result-item:last-child {
-    border-bottom: none;
-}
-
-.result-item:hover {
-    background: rgba(52, 152, 219, 0.05);
-}
-
-.result-type {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-}
-
-.result-type.quran {
-    background: #e8f5e9;
-    color: #2e7d32;
-}
-
-.result-type.hadith {
-    background: #e3f2fd;
-    color: #1565c0;
-}
-
-.result-type.tafsir {
-    background: #fff3e0;
-    color: #ef6c00;
-}
-
-.result-content {
-    margin: 1rem 0;
-    padding: 1rem;
-    background: #f8f9fa;
-    border-radius: 10px;
-    font-family: 'Traditional Arabic', Arial, sans-serif;
-}
-
-.result-reference {
-    font-size: 0.9rem;
-    color: #6c757d;
-}
-
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.loading-spinner {
-    width: 4rem;
-    height: 4rem;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid var(--accent-color);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.quran-response {
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-    text-align: right;
-}
-
-.quran-response p {
-    margin-bottom: 1rem;
-    text-align: justify;
-}
-
-.quran-response ol {
-    padding-right: 1.5rem;
-    margin-bottom: 1rem;
-}
-
-.quran-response li {
-    margin-bottom: 0.5rem;
-}
-
-.quran-content {
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.hadith-content {
-    background-color: #e3f2fd;
-    border-radius: 10px;
-    padding: 1.5rem;
-    margin-top: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.reference {
-    font-size: 0.9rem;
-    color: #6c757d;
-    margin-top: 0.5rem;
-}
-</style>
-
+{% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchForm = document.getElementById('searchForm');
+    const resultsSection = document.getElementById('resultsSection');
     const searchResults = document.getElementById('searchResults');
-    const resultsContent = document.getElementById('resultsContent');
+    const loadingOverlay = document.getElementById('loadingOverlay');
 
     searchForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        const searchQuery = document.getElementById('searchInput').value.trim();
-        const searchTypes = {
-            quran: document.getElementById('quran').checked,
-            hadith: document.getElementById('hadith').checked,
-            tafsir: document.getElementById('tafsir').checked
-        };
+        const query = document.getElementById('searchQuery').value.trim();
+        const searchType = document.querySelector('input[name="searchType"]:checked').value;
         
-        if (!searchQuery) return;
-        if (!searchTypes.quran && !searchTypes.hadith && !searchTypes.tafsir) {
-            showError('الرجاء اختيار نطاق واحد على الأقل للبحث');
+        if (!query) {
+            showAlert('error', 'الرجاء إدخال نص للبحث');
             return;
         }
 
-        // Show loading overlay
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.className = 'loading-overlay';
-        loadingOverlay.innerHTML = '<div class="loading-spinner"></div>';
-        document.body.appendChild(loadingOverlay);
-
+        loadingOverlay.classList.remove('d-none');
+        
         try {
-            const response = await fetch('/api/quran-sunnah/search', {
+            const response = await fetch('/api/quran_sunnah/search', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    query: searchQuery,
-                    types: searchTypes
+                body: JSON.stringify({ 
+                    query: query,
+                    type: searchType
                 })
             });
 
             const data = await response.json();
-
-            if (data.error) {
-                showError(data.error);
+            
+            if (response.ok) {
+                searchResults.innerHTML = data.results.replace(/\n/g, '<br>');
+                resultsSection.classList.remove('d-none');
+                window.scrollTo({
+                    top: resultsSection.offsetTop,
+                    behavior: 'smooth'
+                });
             } else {
-                // Format and display the results
-                resultsContent.innerHTML = formatResults(data.results);
-                searchResults.style.display = 'block';
-                searchResults.scrollIntoView({ behavior: 'smooth' });
+                showAlert('error', data.error || 'حدث خطأ في معالجة طلبك');
             }
         } catch (error) {
-            showError('حدث خطأ في الاتصال');
+            showAlert('error', 'حدث خطأ في الاتصال');
         } finally {
-            loadingOverlay.remove();
+            loadingOverlay.classList.add('d-none');
         }
     });
-});
 
-function formatResults(results) {
-    if (!results || results.length === 0) {
-        return `
-            <div class="text-center py-4">
-                <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                <p class="lead">لم يتم العثور على نتائج</p>
-            </div>
+    // عرض التنبيهات
+    function showAlert(type, message) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         `;
+        
+        searchForm.insertAdjacentElement('beforebegin', alertDiv);
+        
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
     }
-
-    return results.map(result => `
-        <div class="result-item">
-            <span class="result-type ${result.type}">
-                ${getTypeIcon(result.type)}
-                ${getTypeName(result.type)}
-            </span>
-            <div class="result-content">
-                ${result.content}
-            </div>
-            <div class="result-reference">
-                <i class="fas fa-bookmark me-1"></i>
-                ${result.reference}
-            </div>
-        </div>
-    `).join('');
-}
-
-function getTypeIcon(type) {
-    const icons = {
-        quran: '<i class="fas fa-quran me-1"></i>',
-        hadith: '<i class="fas fa-book me-1"></i>',
-        tafsir: '<i class="fas fa-book-open me-1"></i>'
-    };
-    return icons[type] || '';
-}
-
-function getTypeName(type) {
-    const names = {
-        quran: 'القرآن الكريم',
-        hadith: 'الحديث الشريف',
-        tafsir: 'التفسير'
-    };
-    return names[type] || type;
-}
-
-function showError(message) {
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'alert alert-danger mt-3';
-    errorDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${message}`;
-    
-    const form = document.getElementById('searchForm');
-    form.insertAdjacentElement('afterend', errorDiv);
-    
-    setTimeout(() => errorDiv.remove(), 5000);
-}
+});
 </script>
+
+<style>
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.search-results {
+    text-align: right;
+    line-height: 1.6;
+    font-size: 1.1rem;
+}
+
+.search-results blockquote {
+    background-color: #f8f9fa;
+    border-right: 4px solid var(--bs-primary);
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.search-results .reference {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+</style>
 {% endblock %}
