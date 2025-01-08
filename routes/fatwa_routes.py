@@ -22,8 +22,9 @@ def get_fatwa():
 
         # تهيئة Gemini API
         gemini = GeminiHelper.get_instance()
-        if not gemini.is_initialized():
-            return jsonify({'error': 'لم يتم تهيئة Gemini API. الرجاء إدخال مفتاح API صالح'}), 400
+        if not gemini.is_initialized:
+            if not gemini.initialize_api():
+                return jsonify({'error': gemini.get_last_error()}), 500
 
         # تحضير السياق للفتوى
         context = f"""أنت فقيه متخصص في الفقه الإسلامي. مهمتك هي الإجابة على الأسئلة الشرعية.
@@ -40,26 +41,30 @@ def get_fatwa():
 
         السؤال: {question}"""
 
-        # الحصول على الفتوى من Gemini
-        response = gemini.generate_text(context)
+        try:
+            # الحصول على الفتوى من Gemini
+            response = gemini.get_response(context)
+            
+            if not response:
+                return jsonify({'error': 'لم نتمكن من الحصول على إجابة. حاول مرة أخرى'}), 500
 
-        if not response:
-            return jsonify({'error': 'لم نتمكن من الحصول على إجابة. حاول مرة أخرى'}), 500
+            # حفظ الفتوى في قاعدة البيانات
+            fatwa = Fatwa(
+                question=question,
+                answer=response,
+                madhahib=madhahib,
+                timestamp=datetime.utcnow()
+            )
+            db.session.add(fatwa)
+            db.session.commit()
 
-        # حفظ الفتوى في قاعدة البيانات
-        fatwa = Fatwa(
-            question=question,
-            answer=response,
-            madhahib=madhahib,
-            timestamp=datetime.utcnow()
-        )
-        db.session.add(fatwa)
-        db.session.commit()
+            return jsonify({
+                'response': response,
+                'timestamp': datetime.utcnow().isoformat()
+            })
 
-        return jsonify({
-            'response': response,
-            'timestamp': datetime.utcnow().isoformat()
-        })
+        except Exception as api_error:
+            return jsonify({'error': f'خطأ في الاتصال مع Gemini API: {str(api_error)}'}), 500
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
