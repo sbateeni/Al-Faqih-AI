@@ -1,655 +1,397 @@
-<!DOCTYPE html>
-<html dir="rtl" lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محادثة مع العالم</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #f8f9fa;
-            --text-color: #212529;
-            --sidebar-bg: #ffffff;
-            --chat-bg: #ffffff;
-            --border-color: #dee2e6;
-            --hover-color: #f8f9fa;
+{% extends "base.html" %}
 
-            /* ألوان العلماء */
-            --hanafi-color: #1565c0;
-            --maliki-color: #2e7d32;
-            --shafii-color: #c62828;
-            --hanbali-color: #6a1b9a;
-            --ashari-color: #283593;
-            --maturidi-color: #00695c;
-            --bukhari-color: #4527a0;
-            --muslim-color: #00838f;
-            --abu-dawood-color: #ad1457;
-            --tirmidhi-color: #1b5e20;
-            --nasai-color: #4a148c;
-            --ibn-majah-color: #827717;
-            --tabari-color: #bf360c;
-            --ibn-kathir-color: #0d47a1;
-            --jilani-color: #1a237e;
-            --ghazali-color: #880e4f;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            font-family: 'Traditional Arabic', Arial, sans-serif;
-            color: var(--text-color);
-            transition: all 0.3s ease;
-        }
-
-        .main-container {
-            display: flex;
-            gap: 2rem;
-            padding: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .sidebar {
-            width: 300px;
-            background: var(--sidebar-bg);
-            border-radius: 10px;
-            padding: 1rem;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            height: calc(100vh - 4rem);
-            overflow-y: auto;
-        }
-
-        .chat-container {
-            flex-grow: 1;
-            max-width: 800px;
-        }
-
-        .chat-box {
-            height: calc(100vh - 250px);
-            overflow-y: auto;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 1rem;
-            background-color: var(--chat-bg);
-            margin-bottom: 1rem;
-        }
-
-        .message {
-            margin-bottom: 1rem;
-            padding: 1rem;
-            border-radius: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .question {
-            background-color: #e3f2fd;
-            color: #0d47a1;
-            margin-left: 20%;
-            border-radius: 15px 15px 0 15px;
-        }
-
-        .answer {
-            margin-right: 20%;
-            border-radius: 15px 15px 15px 0;
-            margin-bottom: 2rem;
-            position: relative;
-        }
-
-        /* ألوان العلماء */
-        [data-scholar="abu-hanifa"] { background-color: #e3f2fd; color: var(--hanafi-color); }
-        [data-scholar="malik"] { background-color: #e8f5e9; color: var(--maliki-color); }
-        [data-scholar="shafii"] { background-color: #ffebee; color: var(--shafii-color); }
-        [data-scholar="ahmad"] { background-color: #f3e5f5; color: var(--hanbali-color); }
-        [data-scholar="ashari"] { background-color: #e8eaf6; color: var(--ashari-color); }
-        [data-scholar="maturidi"] { background-color: #e0f2f1; color: var(--maturidi-color); }
-        [data-scholar="bukhari"] { background-color: #ede7f6; color: var(--bukhari-color); }
-        [data-scholar="muslim"] { background-color: #e0f7fa; color: var(--muslim-color); }
-        [data-scholar="abu-dawood"] { background-color: #fce4ec; color: var(--abu-dawood-color); }
-        [data-scholar="tirmidhi"] { background-color: #e8f5e9; color: var(--tirmidhi-color); }
-        [data-scholar="nasai"] { background-color: #f3e5f5; color: var(--nasai-color); }
-        [data-scholar="ibn-majah"] { background-color: #f9fbe7; color: var(--ibn-majah-color); }
-        [data-scholar="tabari"] { background-color: #fbe9e7; color: var(--tabari-color); }
-        [data-scholar="ibn-kathir"] { background-color: #e3f2fd; color: var(--ibn-kathir-color); }
-        [data-scholar="jilani"] { background-color: #e8eaf6; color: var(--jilani-color); }
-        [data-scholar="ghazali"] { background-color: #fce4ec; color: var(--ghazali-color); }
-
-        .answer h3 {
-            font-weight: bold;
-            margin: 1rem 0;
-            font-size: 1.2rem;
-        }
-
-        .answer p {
-            margin: 0.5rem 0;
-            line-height: 1.6;
-        }
-
-        .answer ul, .answer ol {
-            margin: 0.5rem 0;
-            padding-right: 1.5rem;
-        }
-
-        .answer li {
-            margin: 0.3rem 0;
-        }
-
-        .answer strong {
-            font-weight: bold;
-        }
-
-        .answer em {
-            font-style: italic;
-        }
-
-        .scholar-info {
-            text-align: center;
-            margin-bottom: 2rem;
-            padding: 1rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .scholar-info h2 {
-            margin-bottom: 0.5rem;
-        }
-
-        .scholar-info .title {
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        .back-btn {
-            margin-bottom: 1rem;
-        }
-
-        @media (max-width: 768px) {
-            .main-container {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-                height: auto;
-                max-height: 300px;
-            }
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #212529;
-            --text-color: #f8f9fa;
-            --sidebar-bg: #343a40;
-            --chat-bg: #343a40;
-            --border-color: #495057;
-            --hover-color: #495057;
-        }
-
-        .theme-toggle {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            background: transparent;
-            border: none;
-            color: var(--text-color);
-            font-size: 1.5rem;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .theme-toggle:hover {
-            background: rgba(0, 0, 0, 0.1);
-        }
-
-        .theme-toggle i {
-            transition: all 0.3s ease;
-        }
-    </style>
-</head>
-<body>
-    <button class="theme-toggle" onclick="toggleTheme()">
-        <i class="fas fa-sun"></i>
-    </button>
-    <div class="main-container">
-        <div class="sidebar">
-            <a href="/" class="btn btn-outline-primary back-btn w-100">
-                <i class="fas fa-arrow-right ml-2"></i>
-                العودة للصفحة الرئيسية
-            </a>
-            <div class="scholars-list mb-3">
-                <h5 class="mb-3">اختر العالم للمحادثة</h5>
-                <div class="list-group">
-                    <!-- أئمة المذاهب -->
-                    <div class="mb-2">
-                        <small class="text-muted d-block mb-1">أئمة المذاهب</small>
-                        <button onclick="loadScholarConversation('abu-hanifa')" class="list-group-item list-group-item-action">الإمام أبو حنيفة</button>
-                        <button onclick="loadScholarConversation('malik')" class="list-group-item list-group-item-action">الإمام مالك</button>
-                        <button onclick="loadScholarConversation('shafii')" class="list-group-item list-group-item-action">الإمام الشافعي</button>
-                        <button onclick="loadScholarConversation('ahmad')" class="list-group-item list-group-item-action">الإمام أحمد</button>
-                    </div>
-
-                    <!-- علماء العقيدة -->
-                    <div class="mb-2">
-                        <small class="text-muted d-block mb-1">علماء العقيدة</small>
-                        <button onclick="loadScholarConversation('ashari')" class="list-group-item list-group-item-action">الإمام الأشعري</button>
-                        <button onclick="loadScholarConversation('maturidi')" class="list-group-item list-group-item-action">الإمام الماتريدي</button>
-                    </div>
-
-                    <!-- أصحاب الصحاح والسنن -->
-                    <div class="mb-2">
-                        <small class="text-muted d-block mb-1">أصحاب الصحاح والسنن</small>
-                        <button onclick="loadScholarConversation('bukhari')" class="list-group-item list-group-item-action">الإمام البخاري</button>
-                        <button onclick="loadScholarConversation('muslim')" class="list-group-item list-group-item-action">الإمام مسلم</button>
-                        <button onclick="loadScholarConversation('abu-dawood')" class="list-group-item list-group-item-action">الإمام أبو داود</button>
-                        <button onclick="loadScholarConversation('tirmidhi')" class="list-group-item list-group-item-action">الإمام الترمذي</button>
-                        <button onclick="loadScholarConversation('nasai')" class="list-group-item list-group-item-action">الإمام النسائي</button>
-                        <button onclick="loadScholarConversation('ibn-majah')" class="list-group-item list-group-item-action">الإمام ابن ماجه</button>
-                    </div>
-
-                    <!-- المفسرون -->
-                    <div class="mb-2">
-                        <small class="text-muted d-block mb-1">المفسرون</small>
-                        <button onclick="loadScholarConversation('tabari')" class="list-group-item list-group-item-action">الإمام الطبري</button>
-                        <button onclick="loadScholarConversation('ibn-kathir')" class="list-group-item list-group-item-action">الإمام ابن كثير</button>
-                    </div>
-
-                    <!-- علماء التصوف والتزكية -->
-                    <div class="mb-2">
-                        <small class="text-muted d-block mb-1">علماء التصوف والتزكية</small>
-                        <button onclick="loadScholarConversation('jilani')" class="list-group-item list-group-item-action">الشيخ عبد القادر الجيلاني</button>
-                        <button onclick="loadScholarConversation('ghazali')" class="list-group-item list-group-item-action">الإمام الغزالي</button>
-                    </div>
-                </div>
-            </div>
-            <div class="search-box mb-3">
-                <h5 class="mb-2">المحادثات السابقة</h5>
-                <input type="text" id="searchInput" class="form-control" placeholder="ابحث في المحادثات السابقة...">
-            </div>
-            <div id="conversationsList">
-                <!-- المحادثات السابقة -->
-            </div>
-        </div>
-
-        <div class="chat-container">
-            <div class="scholar-info" id="scholarInfo">
-                <!-- معلومات العالم -->
-            </div>
-            
-            <div class="chat-box" id="chatBox">
-                <!-- المحادثات ستظهر هنا -->
-            </div>
-
-            <div class="loading" id="loading" style="display: none;">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">جاري التحميل...</span>
-                </div>
-            </div>
-
-            <form id="questionForm" class="mt-3">
-                <div class="input-group">
-                    <input type="text" id="questionInput" class="form-control" placeholder="اكتب سؤالك هنا..." required>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-paper-plane"></i> إرسال
-                    </button>
-                </div>
-            </form>
-        </div>
+{% block content %}
+<div class="container mt-5">
+    <!-- Hero Section -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 mb-3">المحادثة الفردية</h1>
+        <p class="lead mb-4">تحدث مع العلماء واحصل على إجابات مفصلة لأسئلتك الشرعية</p>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // تحديث عنوان API للمحادثة الفردية
-        const API_URL = '/api/chat/individual';
-
-        // تحديث عنوان API للتحقق من حالة الخادم
-        const HEALTH_CHECK_URL = '/api/health';
-
-        // معلومات العلماء
-        const scholars = {
-            'abu-hanifa': {
-                name: 'الإمام أبو حنيفة النعمان',
-                title: 'إمام المذهب الحنفي (80-150 هـ)',
-                color: 'var(--hanafi-color)'
-            },
-            'malik': {
-                name: 'الإمام مالك بن أنس',
-                title: 'إمام المذهب المالكي (93-179 هـ)',
-                color: 'var(--maliki-color)'
-            },
-            'shafii': {
-                name: 'الإمام محمد بن إدريس الشافعي',
-                title: 'إمام المذهب الشافعي (150-204 هـ)',
-                color: 'var(--shafii-color)'
-            },
-            'ahmad': {
-                name: 'الإمام أحمد بن حنبل',
-                title: 'إمام المذهب الحنبلي (164-241 هـ)',
-                color: 'var(--hanbali-color)'
-            },
-            'ashari': {
-                name: 'الإمام أبو الحسن الأشعري',
-                title: 'مؤسس المذهب الأشعري (260-324 هـ)',
-                color: 'var(--ashari-color)'
-            },
-            'maturidi': {
-                name: 'الإمام أبو منصور الماتريدي',
-                title: 'مؤسس المذهب الماتريدي (238-333 هـ)',
-                color: 'var(--maturidi-color)'
-            },
-            'bukhari': {
-                name: 'الإمام البخاري',
-                title: 'صاحب صحيح البخاري (194-256 هـ)',
-                color: 'var(--bukhari-color)'
-            },
-            'muslim': {
-                name: 'الإمام مسلم',
-                title: 'صاحب صحيح مسلم (204-261 هـ)',
-                color: 'var(--muslim-color)'
-            },
-            'abu-dawood': {
-                name: 'الإمام أبو داود',
-                title: 'صاحب سنن أبي داود (202-275 هـ)',
-                color: 'var(--abu-dawood-color)'
-            },
-            'tirmidhi': {
-                name: 'الإمام الترمذي',
-                title: 'صاحب جامع الترمذي (209-279 هـ)',
-                color: 'var(--tirmidhi-color)'
-            },
-            'nasai': {
-                name: 'الإمام النسائي',
-                title: 'صاحب سنن النسائي (215-303 هـ)',
-                color: 'var(--nasai-color)'
-            },
-            'ibn-majah': {
-                name: 'الإمام ابن ماجه',
-                title: 'صاحب سنن ابن ماجه (209-273 هـ)',
-                color: 'var(--ibn-majah-color)'
-            },
-            'tabari': {
-                name: 'الإمام الطبري',
-                title: 'صاحب تفسير الطبري (224-310 هـ)',
-                color: 'var(--tabari-color)'
-            },
-            'ibn-kathir': {
-                name: 'الإمام ابن كثير',
-                title: 'صاحب تفسير ابن كثير (700-774 هـ)',
-                color: 'var(--ibn-kathir-color)'
-            },
-            'jilani': {
-                name: 'الشيخ عبد القادر الجيلاني',
-                title: 'محيي الدين (470-561 هـ)',
-                color: 'var(--jilani-color)'
-            },
-            'ghazali': {
-                name: 'الإمام أبو حامد الغزالي',
-                title: 'حجة الإسلام (450-505 هـ)',
-                color: 'var(--ghazali-color)'
-            }
-        };
-
-        let currentScholar = null;
-        let conversations = {};
-
-        // تحميل المحادثات المحفوظة
-        function loadConversations() {
-            const saved = localStorage.getItem('conversations');
-            if (saved) {
-                conversations = JSON.parse(saved);
-                updateConversationsList();
-            }
-        }
-
-        // حفظ المحادثات
-        function saveConversations() {
-            localStorage.setItem('conversations', JSON.stringify(conversations));
-            updateConversationsList();
-        }
-
-        // تحديث قائمة المحادثات
-        function updateConversationsList() {
-            const list = document.getElementById('conversationsList');
-            list.innerHTML = '';
-            
-            Object.keys(conversations).forEach(scholarId => {
-                const scholar = scholars[scholarId];
-                const conv = conversations[scholarId];
-                if (conv && conv.messages && conv.messages.length > 0) {
-                    const div = document.createElement('div');
-                    div.className = 'conversation-item p-2 mb-2 rounded';
-                    div.style.backgroundColor = `${scholar.color}20`;
-                    div.style.cursor = 'pointer';
-                    div.innerHTML = `
-                        <h5 class="mb-1">${scholar.name}</h5>
-                        <small class="text-muted">${conv.messages.length} رسائل</small>
-                    `;
-                    div.onclick = () => loadScholarConversation(scholarId);
-                    list.appendChild(div);
-                }
-            });
-        }
-
-        // تحميل محادثة عالم معين
-        function loadScholarConversation(scholarId) {
-            currentScholar = scholarId;
-            const scholar = scholars[scholarId];
-            
-            // تحديث معلومات العالم
-            document.getElementById('scholarInfo').innerHTML = `
-                <h2>${scholar.name}</h2>
-                <div class="title">${scholar.title}</div>
-            `;
-            
-            // عرض المحادثات السابقة
-            const chatBox = document.getElementById('chatBox');
-            chatBox.innerHTML = '';
-            
-            if (conversations[scholarId] && conversations[scholarId].messages) {
-                conversations[scholarId].messages.forEach(msg => {
-                    appendMessage(msg.type, msg.text, scholarId);
-                });
-            } else {
-                conversations[scholarId] = { messages: [] };
-            }
-            
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        // إضافة رسالة للمحادثة
-        function appendMessage(type, text, scholarId) {
-            const chatBox = document.getElementById('chatBox');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${type}`;
-            
-            if (type === 'answer') {
-                messageDiv.setAttribute('data-scholar', scholarId);
-                messageDiv.innerHTML = formatAnswer(text);
-            } else {
-                messageDiv.textContent = text;
-            }
-            
-            chatBox.appendChild(messageDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        // إضافة دالة تنسيق الإجابة
-        function formatAnswer(text) {
-            return text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .split('\n\n')
-                .map(paragraph => {
-                    if (paragraph.startsWith('* ')) {
-                        const items = paragraph.split('\n* ');
-                        return '<ul>' + items.map(item => 
-                            item.trim() ? '<li>' + item.replace('* ', '') + '</li>' : ''
-                        ).join('') + '</ul>';
-                    } else if (paragraph.startsWith('**')) {
-                        return '<h3>' + paragraph.replace(/\*\*/g, '') + '</h3>';
-                    } else {
-                        return '<p>' + paragraph + '</p>';
-                    }
-                })
-                .join('');
-        }
-
-        // إضافة رسالة خطأ للمحادثة
-        function appendErrorMessage(error) {
-            const chatBox = document.getElementById('chatBox');
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'message error alert alert-danger';
-            errorDiv.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        ${error}
+    <!-- Chat Interface -->
+    <div class="row justify-content-center">
+        <div class="col-lg-4 mb-4">
+            <!-- Scholar Selection -->
+            <div class="card shadow-lg mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-tie me-2"></i>
+                        اختر العالم
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <select id="scholarSelect" class="form-select mb-3">
+                        <option value="abu-hanifa">الإمام أبو حنيفة النعمان بن ثابت (80-150 هـ)</option>
+                        <option value="malik">الإمام مالك بن أنس بن مالك الأصبحي (93-179 هـ)</option>
+                        <option value="shafii">الإمام محمد بن إدريس الشافعي (150-204 هـ)</option>
+                        <option value="ahmad">الإمام أحمد بن محمد بن حنبل الشيباني (164-241 هـ)</option>
+                        <option value="bukhari">الإمام محمد بن إسماعيل البخاري (194-256 هـ)</option>
+                        <option value="muslim">الإمام مسلم بن الحجاج النيسابوري (204-261 هـ)</option>
+                        <option value="tirmidhi">الإمام محمد بن عيسى الترمذي (209-279 هـ)</option>
+                        <option value="nasai">الإمام أحمد بن شعيب النسائي (215-303 هـ)</option>
+                        <option value="ibn-majah">الإمام محمد بن يزيد بن ماجه القزويني (209-273 هـ)</option>
+                        <option value="abu-dawood">الإمام سليمان بن الأشعث السجستاني (202-275 هـ)</option>
+                        <option value="ghazali">الإمام أبو حامد محمد الغزالي (450-505 هـ)</option>
+                        <option value="nawawi">الإمام يحيى بن شرف النووي (631-676 هـ)</option>
+                        <option value="ibn-taymiyyah">الإمام أحمد بن عبد الحليم بن تيمية (661-728 هـ)</option>
+                        <option value="ibn-kathir">الإمام إسماعيل بن عمر بن كثير (700-774 هـ)</option>
+                    </select>
+                    <div class="scholar-info mt-3">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-user-circle fa-4x text-primary"></i>
+                        </div>
+                        <h6 class="text-center mb-2" id="scholarName">الإمام أبو حنيفة النعمان</h6>
+                        <p class="text-muted text-center small" id="scholarInfo">
+                            إمام المذهب الحنفي ومؤسس مدرسة الرأي في الفقه الإسلامي
+                        </p>
                     </div>
-                    <button class="btn btn-outline-danger btn-sm" onclick="retryLastQuestion()">
-                        <i class="fas fa-redo me-1"></i>
-                        إعادة المحاولة
+                </div>
+            </div>
+
+            <!-- Chat History -->
+            <div class="card shadow-lg">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>
+                        المحادثات السابقة
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="chatHistory" class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;">
+                        <!-- Chat history will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <!-- Chat Messages -->
+            <div class="card shadow-lg">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-comments me-2"></i>
+                        المحادثة
+                    </h5>
+                    <button class="btn btn-outline-primary btn-sm" onclick="clearChat()">
+                        <i class="fas fa-trash-alt me-1"></i>
+                        مسح المحادثة
                     </button>
                 </div>
-            `;
-            chatBox.appendChild(errorDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
+                <div class="card-body">
+                    <div id="chatMessages" class="chat-messages mb-4" style="height: 400px; overflow-y: auto;">
+                        <!-- Messages will be displayed here -->
+                    </div>
 
-        // تخزين آخر سؤال
-        let lastQuestion = '';
+                    <!-- Message Input -->
+                    <form id="messageForm" class="mt-3">
+                        <div class="input-group">
+                            <textarea id="messageInput" class="form-control" rows="2" 
+                                    placeholder="اكتب سؤالك هنا..." required></textarea>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-1"></i>
+                                إرسال
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // إعادة محاولة السؤال الأخير
-        async function retryLastQuestion() {
-            if (lastQuestion) {
-                const questionInput = document.getElementById('questionInput');
-                questionInput.value = lastQuestion;
-                await sendQuestion(lastQuestion);
-            }
-        }
+<style>
+.chat-messages {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
 
-        // إرسال السؤال إلى الخادم
-        async function sendQuestion(question) {
-            const loading = document.getElementById('loading');
-            const questionInput = document.getElementById('questionInput');
+.message {
+    margin-bottom: 1rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: messageAppear 0.5s ease forwards;
+}
+
+@keyframes messageAppear {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-user {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.message-scholar {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.message-content {
+    max-width: 80%;
+    padding: 1rem;
+    border-radius: 15px;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.message-user .message-content {
+    background: var(--accent-color);
+    color: white;
+    border-bottom-right-radius: 5px;
+}
+
+.message-scholar .message-content {
+    background: white;
+    border-bottom-left-radius: 5px;
+}
+
+.message-time {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+    text-align: center;
+}
+
+.typing-indicator {
+    display: flex;
+    padding: 0.5rem;
+    background: white;
+    border-radius: 10px;
+    width: fit-content;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    margin: 0 2px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    animation: typingAnimation 1s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) { animation-delay: 0.2s; }
+.typing-dot:nth-child(2) { animation-delay: 0.3s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingAnimation {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.scholar-info {
+    transition: all 0.3s ease;
+}
+
+#chatHistory .list-group-item {
+    border: none;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#chatHistory .list-group-item:hover {
+    background: rgba(52, 152, 219, 0.1);
+}
+
+#chatHistory .list-group-item:last-child {
+    border-bottom: none;
+}
+</style>
+
+<script>
+const scholarInfo = {
+    'abu-hanifa': {
+        name: 'الإمام أبو حنيفة النعمان بن ثابت',
+        info: 'إمام المذهب الحنفي ومؤسس مدرسة الرأي في الفقه الإسلامي (80-150 هـ)'
+    },
+    'malik': {
+        name: 'الإمام مالك بن أنس بن مالك الأصبحي',
+        info: 'إمام دار الهجرة وصاحب المذهب المالكي (93-179 هـ)'
+    },
+    'shafii': {
+        name: 'الإمام محمد بن إدريس الشافعي',
+        info: 'مؤسس علم أصول الفقه وصاحب المذهب الشافعي (150-204 هـ)'
+    },
+    'ahmad': {
+        name: 'الإمام أحمد بن محمد بن حنبل الشيباني',
+        info: 'إمام أهل السنة وصاحب المذهب الحنبلي (164-241 هـ)'
+    },
+    'bukhari': {
+        name: 'الإمام محمد بن إسماعيل البخاري',
+        info: 'صاحب الجامع الصحيح (صحيح البخاري) (194-256 هـ)'
+    },
+    'muslim': {
+        name: 'الإمام مسلم بن الحجاج النيسابوري',
+        info: 'صاحب المسند الصحيح (صحيح مسلم) (204-261 هـ)'
+    },
+    'tirmidhi': {
+        name: 'الإمام محمد بن عيسى الترمذي',
+        info: 'صاحب الجامع (سنن الترمذي) (209-279 هـ)'
+    },
+    'nasai': {
+        name: 'الإمام أحمد بن شعيب النسائي',
+        info: 'صاحب السنن الكبرى والصغرى (215-303 هـ)'
+    },
+    'ibn-majah': {
+        name: 'الإمام محمد بن يزيد بن ماجه القزويني',
+        info: 'صاحب السنن (سنن ابن ماجه) (209-273 هـ)'
+    },
+    'abu-dawood': {
+        name: 'الإمام سليمان بن الأشعث السجستاني',
+        info: 'صاحب السنن (سنن أبي داود) (202-275 هـ)'
+    },
+    'ghazali': {
+        name: 'الإمام أبو حامد محمد الغزالي',
+        info: 'حجة الإسلام وصاحب إحياء علوم الدين (450-505 هـ)'
+    },
+    'nawawi': {
+        name: 'الإمام يحيى بن شرف النووي',
+        info: 'صاحب رياض الصالحين والأربعين النووية (631-676 هـ)'
+    },
+    'ibn-taymiyyah': {
+        name: 'الإمام أحمد بن عبد الحليم بن تيمية',
+        info: 'شيخ الإسلام وصاحب مجموع الفتاوى (661-728 هـ)'
+    },
+    'ibn-kathir': {
+        name: 'الإمام إسماعيل بن عمر بن كثير',
+        info: 'صاحب تفسير القرآن العظيم والبداية والنهاية (700-774 هـ)'
+    }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    // تحديث معلومات العالم عند تغيير الاختيار
+    document.getElementById('scholarSelect').addEventListener('change', function() {
+        const scholar = scholarInfo[this.value];
+        document.getElementById('scholarName').textContent = scholar.name;
+        document.getElementById('scholarInfo').textContent = scholar.info;
+    });
+
+    // معالجة إرسال الرسالة
+    document.getElementById('messageForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const messageInput = document.getElementById('messageInput');
+        const message = messageInput.value.trim();
+        
+        if (message) {
+            addMessage(message, 'user');
+            messageInput.value = '';
+            showTypingIndicator();
             
-            try {
-                loading.style.display = 'block';
-                questionInput.disabled = true;
-
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        question: question,
-                        scholar: currentScholar
-                    })
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error || 'حدث خطأ في معالجة السؤال');
+            // إرسال الرسالة إلى الخادم
+            const scholar = document.getElementById('scholarSelect').value;
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    scholar: scholar
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideTypingIndicator();
+                if (data.error) {
+                    showError(data.error);
+                } else {
+                    addMessage(data.response, 'scholar');
+                    updateChatHistory(message, data.response);
                 }
-
-                if (typeof data.response !== 'string') {
-                    throw new Error('تنسيق الرد غير صحيح');
-                }
-
-                // إضافة الإجابة للمحادثة
-                appendMessage('answer', data.response, currentScholar);
-                
-                if (!conversations[currentScholar]) {
-                    conversations[currentScholar] = { messages: [] };
-                }
-                
-                conversations[currentScholar].messages.push({
-                    type: 'answer',
-                    text: data.response
-                });
-
-                // حفظ المحادثات
-                saveConversations();
-                lastQuestion = ''; // مسح آخر سؤال بعد النجاح
-
-            } catch (error) {
-                console.error('Error:', error);
-                appendErrorMessage(error.message);
-                lastQuestion = question; // حفظ السؤال للمحاولة مرة أخرى
-            } finally {
-                loading.style.display = 'none';
-                questionInput.disabled = false;
-                questionInput.focus();
-            }
-        }
-
-        // معالجة إرسال السؤال
-        document.getElementById('questionForm').onsubmit = async function(e) {
-            e.preventDefault();
-            
-            if (!currentScholar) {
-                alert('الرجاء اختيار عالم أولاً');
-                return;
-            }
-
-            const questionInput = document.getElementById('questionInput');
-            const question = questionInput.value.trim();
-            
-            if (!question) return;
-
-            // إضافة السؤال للمحادثة
-            appendMessage('question', question, currentScholar);
-            conversations[currentScholar].messages.push({
-                type: 'question',
-                text: question
+            })
+            .catch(error => {
+                hideTypingIndicator();
+                showError('حدث خطأ في الاتصال');
             });
-
-            questionInput.value = '';
-            await sendQuestion(question);
-        };
-
-        // البحث في المحادثات
-        document.getElementById('searchInput').oninput = function(e) {
-            const searchText = e.target.value.toLowerCase();
-            const items = document.querySelectorAll('.conversation-item');
-            
-            items.forEach(item => {
-                const text = item.textContent.toLowerCase();
-                item.style.display = text.includes(searchText) ? 'block' : 'none';
-            });
-        };
-
-        // تبديل الثيم
-        function toggleTheme() {
-            const body = document.documentElement;
-            const themeToggle = document.querySelector('.theme-toggle i');
-            
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.removeAttribute('data-theme');
-                themeToggle.className = 'fas fa-sun';
-                localStorage.setItem('theme', 'light');
-            } else {
-                body.setAttribute('data-theme', 'dark');
-                themeToggle.className = 'fas fa-moon';
-                localStorage.setItem('theme', 'dark');
-            }
         }
+    });
+});
 
-        // تحميل الثيم المحفوظ
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        if (savedTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            document.querySelector('.theme-toggle i').className = 'fas fa-moon';
-        }
+function addMessage(text, type) {
+    const chatMessages = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message message-${type}`;
+    
+    const content = document.createElement('div');
+    content.className = 'message-content';
+    content.textContent = text;
+    
+    const time = document.createElement('div');
+    time.className = 'message-time';
+    time.textContent = new Date().toLocaleTimeString();
+    
+    messageDiv.appendChild(content);
+    messageDiv.appendChild(time);
+    chatMessages.appendChild(messageDiv);
+    
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
 
-        // تحميل المحادثات عند بدء التطبيق
-        loadConversations();
+function showTypingIndicator() {
+    const chatMessages = document.getElementById('chatMessages');
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'message message-scholar';
+    typingDiv.id = 'typingIndicator';
+    
+    typingDiv.innerHTML = `
+        <div class="typing-indicator">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        </div>
+    `;
+    
+    chatMessages.appendChild(typingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
 
-        // تحميل أول عالم افتراضياً
-        loadScholarConversation('abu-hanifa');
-    </script>
-</body>
-</html> 
+function hideTypingIndicator() {
+    const typingIndicator = document.getElementById('typingIndicator');
+    if (typingIndicator) {
+        typingIndicator.remove();
+    }
+}
+
+function showError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'alert alert-danger';
+    errorDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${message}`;
+    
+    const chatMessages = document.getElementById('chatMessages');
+    chatMessages.appendChild(errorDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    setTimeout(() => errorDiv.remove(), 5000);
+}
+
+function updateChatHistory(question, answer) {
+    const chatHistory = document.getElementById('chatHistory');
+    const historyItem = document.createElement('a');
+    historyItem.className = 'list-group-item';
+    historyItem.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="text-truncate">${question}</div>
+            <small class="text-muted">${new Date().toLocaleTimeString()}</small>
+        </div>
+    `;
+    
+    historyItem.addEventListener('click', () => {
+        addMessage(question, 'user');
+        addMessage(answer, 'scholar');
+    });
+    
+    chatHistory.insertBefore(historyItem, chatHistory.firstChild);
+}
+
+function clearChat() {
+    if (confirm('هل أنت متأكد من رغبتك في مسح المحادثة؟')) {
+        document.getElementById('chatMessages').innerHTML = '';
+    }
+}
+</script>
+{% endblock %} 
