@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify, render_template
 from models.chat import Chat, db
+from models.fatwa import Fatwa
 from utils.gemini_helper import GeminiHelper
+from utils.gemini import get_gemini_response
 from datetime import datetime
 
 fatwa_bp = Blueprint('fatwa', __name__)
@@ -12,67 +14,42 @@ def fatwa_page():
 
 @fatwa_bp.route('/api/fatwa', methods=['POST'])
 def get_fatwa():
-    """الحصول على فتوى من النموذج"""
     try:
         data = request.get_json()
         question = data.get('question')
-        madhab = data.get('madhab', 'all')
+        madhahib = data.get('madhahib', ['hanafi', 'maliki', 'shafii', 'hanbali'])
         
         if not question:
-            return jsonify({'error': 'الرجاء إدخال سؤال'}), 400
+            return jsonify({'error': 'الرجاء إدخال السؤال'}), 400
 
-        # تهيئة Gemini API
-        gemini = GeminiHelper.get_instance()
-        if not gemini.is_initialized():
-            return jsonify({'error': 'لم يتم تهيئة Gemini API. الرجاء إدخال مفتاح API صالح'}), 400
-
-        # إضافة السياق للسؤال
-        context = f"""أنت عالم إسلامي متخصص في الفقه الإسلامي. مهمتك هي:
-
-1. تقديم الفتوى:
-   - الإجابة على السؤال بوضوح ودقة
-   - تقسيم الإجابة إلى نقاط مرتبة
-   - استخدام لغة سهلة ومفهومة
-
-2. الأدلة الشرعية:
-   - ذكر الدليل من القرآن الكريم (مع رقم السورة والآية)
-   - ذكر الدليل من السنة النبوية (مع درجة صحة الحديث)
-   - ذكر الإجماع إن وجد
-
-3. آراء المذاهب:
-   {'- ذكر آراء المذاهب الأربعة في المسألة' if madhab == 'all' else f'- التركيز على رأي المذهب {madhab}'}
-   - بيان سبب الاختلاف إن وجد
-   - ذكر الرأي الراجح مع دليله
-
-4. الخلاصة والتوصيات:
-   - تلخيص الحكم الشرعي
-   - ذكر النصائح والتوجيهات المتعلقة
-   - الإشارة إلى المراجع الفقهية المعتمدة
-
-السؤال هو: {question}
-"""
+        # تحضير السياق للفتوى
+        context = f"""أنت فقيه متخصص في الفقه الإسلامي. مهمتك هي الإجابة على الأسئلة الشرعية.
+        يجب أن تقدم الفتوى بالتفصيل مع ذكر الأدلة من القرآن والسنة.
         
-        # الحصول على الإجابة من النموذج
-        response = gemini.generate_text(context)
+        المطلوب ذكر آراء المذاهب التالية: {', '.join(madhahib)}
         
-        if not response:
-            return jsonify({'error': 'لم نتمكن من الحصول على إجابة. حاول مرة أخرى'}), 500
+        قم بتنظيم الإجابة في الأقسام التالية:
+        1. الحكم الشرعي
+        2. الأدلة من القرآن والسنة
+        3. آراء المذاهب المختلفة
+        4. الخلاصة والترجيح
+        5. التوصيات العملية"""
 
-        # تنسيق الإجابة
-        formatted_response = format_fatwa(response)
+        # الحصول على الفتوى من Gemini
+        response = get_gemini_response(context + "\n\nالسؤال: " + question)
 
         # حفظ الفتوى في قاعدة البيانات
-        chat = Chat(
+        fatwa = Fatwa(
             question=question,
             answer=response,
-            chat_type='fatwa'
+            madhahib=madhahib,
+            timestamp=datetime.utcnow()
         )
-        db.session.add(chat)
-        db.session.commit()
+        fatwa.save()
 
         return jsonify({
-            'answer': formatted_response,
-            'chat_id': chat.id
+            'response': response,
+            'timestamp': datetime.utcnow().isoformat()
         })
 
     except Exception as e:
@@ -80,20 +57,20 @@ def get_fatwa():
 
 @fatwa_bp.route('/api/fatwa/recent', methods=['GET'])
 def get_recent_fatwas():
-    """الحصول على آخر الفتاوى"""
     try:
-        recent_fatwas = Chat.query.filter_by(chat_type='fatwa')\
-            .order_by(Chat.created_at.desc())\
-            .limit(5)\
-            .all()
+        # الحصول على آخر 10 فتاوى
+        fatwas = Fatwa.query.order_by(Fatwa.timestamp.desc()).limit(10).all()
         
-        return jsonify({
-            'fatwas': [{
-                'id': fatwa.id,
+        recent_fatwas = []
+        for fatwa in fatwas:
+            recent_fatwas.append({
                 'question': fatwa.question,
-                'created_at': fatwa.created_at.isoformat()
-            } for fatwa in recent_fatwas]
-        })
+                'answer': fatwa.answer,
+                'madhahib': fatwa.madhahib,
+                'timestamp': fatwa.timestamp.isoformat()
+            })
+        
+        return jsonify(recent_fatwas)
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500

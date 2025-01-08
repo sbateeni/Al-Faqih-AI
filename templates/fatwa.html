@@ -12,6 +12,54 @@
                 </div>
                 <div class="card-body">
                     <form id="fatwaForm">
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="card shadow-lg">
+                                    <div class="card-header bg-primary text-white">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-balance-scale me-2"></i>
+                                            المذاهب الفقهية
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-3 mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="hanafi" id="hanafiCheck" checked>
+                                                    <label class="form-check-label" for="hanafiCheck">
+                                                        المذهب الحنفي
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="maliki" id="malikiCheck" checked>
+                                                    <label class="form-check-label" for="malikiCheck">
+                                                        المذهب المالكي
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="shafii" id="shafiiCheck" checked>
+                                                    <label class="form-check-label" for="shafiiCheck">
+                                                        المذهب الشافعي
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="hanbali" id="hanbaliCheck" checked>
+                                                    <label class="form-check-label" for="hanbaliCheck">
+                                                        المذهب الحنبلي
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="mb-3">
                             <label for="question" class="form-label">سؤالك</label>
                             <textarea class="form-control" id="question" rows="3" 
@@ -64,6 +112,17 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        const madhahib = [];
+        const hanafiCheck = document.getElementById('hanafiCheck');
+        const malikiCheck = document.getElementById('malikiCheck');
+        const shafiiCheck = document.getElementById('shafiiCheck');
+        const hanbaliCheck = document.getElementById('hanbaliCheck');
+
+        if (hanafiCheck.checked) madhahib.push('hanafi');
+        if (malikiCheck.checked) madhahib.push('maliki');
+        if (shafiiCheck.checked) madhahib.push('shafii');
+        if (hanbaliCheck.checked) madhahib.push('hanbali');
+
         loadingOverlay.classList.remove('d-none');
         
         try {
@@ -72,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ question: question })
+                body: JSON.stringify({ question: question, madhahib: madhahib })
             });
 
             const data = await response.json();

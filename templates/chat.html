@@ -1,18 +1,77 @@
 {% extends "base.html" %}
 
-{% block title %}المحادثة{% endblock %}
+{% block title %}المحادثة مع العلماء{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <!-- Header -->
     <div class="text-center mb-5">
-        <h1 class="display-4 mb-3">المحادثة مع الفقيه</h1>
-        <p class="lead mb-4">تحدث مع الفقيه AI واحصل على إجابات لأسئلتك</p>
+        <h1 class="display-4 mb-3">المحادثة مع العلماء</h1>
+        <p class="lead mb-4">تحدث مع العلماء واحصل على إجابات لأسئلتك الشرعية</p>
     </div>
 
     <div class="row justify-content-center">
+        <!-- Scholar Selection Sidebar -->
+        <div class="col-lg-4">
+            <!-- Scholar Selection -->
+            <div class="card shadow-lg mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-tie me-2"></i>
+                        اختر العالم
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <select id="scholarSelect" class="form-select mb-3">
+                        <optgroup label="المذاهب الأربعة">
+                            <option value="abu-hanifa">الإمام أبو حنيفة النعمان (80-150 هـ)</option>
+                            <option value="malik">الإمام مالك بن أنس (93-179 هـ)</option>
+                            <option value="shafii">الإمام الشافعي (150-204 هـ)</option>
+                            <option value="ahmad">الإمام أحمد بن حنبل (164-241 هـ)</option>
+                        </optgroup>
+                        <optgroup label="علماء الحديث">
+                            <option value="bukhari">الإمام البخاري (194-256 هـ)</option>
+                            <option value="muslim">الإمام مسلم (204-261 هـ)</option>
+                            <option value="tirmidhi">الإمام الترمذي (209-279 هـ)</option>
+                            <option value="nasai">الإمام النسائي (215-303 هـ)</option>
+                            <option value="ibn-majah">الإمام ابن ماجه (209-273 هـ)</option>
+                            <option value="abu-dawood">الإمام أبو داود (202-275 هـ)</option>
+                        </optgroup>
+                        <optgroup label="علماء آخرون">
+                            <option value="ghazali">الإمام الغزالي (450-505 هـ)</option>
+                            <option value="nawawi">الإمام النووي (631-676 هـ)</option>
+                            <option value="ibn-taymiyyah">شيخ الإسلام ابن تيمية (661-728 هـ)</option>
+                            <option value="ibn-kathir">الإمام ابن كثير (700-774 هـ)</option>
+                        </optgroup>
+                    </select>
+                    <div class="scholar-info text-center">
+                        <i class="fas fa-user-circle fa-4x text-primary mb-3"></i>
+                        <h6 class="mb-2" id="scholarName">الإمام أبو حنيفة النعمان</h6>
+                        <p class="text-muted small" id="scholarInfo">
+                            إمام المذهب الحنفي ومؤسس مدرسة الرأي في الفقه الإسلامي
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat History -->
+            <div class="card shadow-lg">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>
+                        المحادثات السابقة
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="chatHistory" class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;">
+                        <!-- Chat history will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
         <div class="col-lg-8">
-            <!-- Chat Container -->
             <div class="card shadow-lg">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">
@@ -37,51 +96,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Sidebar -->
-        <div class="col-lg-4">
-            <!-- Chat Info -->
-            <div class="card shadow-lg mb-4">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">
-                        <i class="fas fa-info-circle me-2"></i>
-                        معلومات المحادثة
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="chat-info">
-                        <p><i class="fas fa-clock me-2"></i>وقت البدء: <span id="startTime"></span></p>
-                        <p><i class="fas fa-comments me-2"></i>عدد الرسائل: <span id="messageCount">0</span></p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="card shadow-lg">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0">
-                        <i class="fas fa-bolt me-2"></i>
-                        إجراءات سريعة
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-outline-primary" onclick="clearChat()">
-                            <i class="fas fa-trash me-1"></i>
-                            مسح المحادثة
-                        </button>
-                        <button class="btn btn-outline-success" onclick="saveChat()">
-                            <i class="fas fa-save me-1"></i>
-                            حفظ المحادثة
-                        </button>
-                        <button class="btn btn-outline-info" onclick="shareChat()">
-                            <i class="fas fa-share-alt me-1"></i>
-                            مشاركة المحادثة
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -96,21 +110,86 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const scholarInfo = {
+        'abu-hanifa': {
+            name: 'الإمام أبو حنيفة النعمان',
+            info: 'إمام المذهب الحنفي ومؤسس مدرسة الرأي في الفقه الإسلامي'
+        },
+        'malik': {
+            name: 'الإمام مالك بن أنس',
+            info: 'إمام دار الهجرة وصاحب المذهب المالكي'
+        },
+        'shafii': {
+            name: 'الإمام الشافعي',
+            info: 'مؤسس علم أصول الفقه وصاحب المذهب الشافعي'
+        },
+        'ahmad': {
+            name: 'الإمام أحمد بن حنبل',
+            info: 'إمام أهل السنة وصاحب المذهب الحنبلي'
+        },
+        'bukhari': {
+            name: 'الإمام البخاري',
+            info: 'صاحب الجامع الصحيح (صحيح البخاري)'
+        },
+        'muslim': {
+            name: 'الإمام مسلم',
+            info: 'صاحب المسند الصحيح (صحيح مسلم)'
+        },
+        'tirmidhi': {
+            name: 'الإمام الترمذي',
+            info: 'صاحب الجامع (سنن الترمذي)'
+        },
+        'nasai': {
+            name: 'الإمام النسائي',
+            info: 'صاحب السنن الكبرى والصغرى'
+        },
+        'ibn-majah': {
+            name: 'الإمام ابن ماجه',
+            info: 'صاحب السنن (سنن ابن ماجه)'
+        },
+        'abu-dawood': {
+            name: 'الإمام أبو داود',
+            info: 'صاحب السنن (سنن أبي داود)'
+        },
+        'ghazali': {
+            name: 'الإمام الغزالي',
+            info: 'حجة الإسلام وصاحب إحياء علوم الدين'
+        },
+        'nawawi': {
+            name: 'الإمام النووي',
+            info: 'صاحب رياض الصالحين والأربعين النووية'
+        },
+        'ibn-taymiyyah': {
+            name: 'شيخ الإسلام ابن تيمية',
+            info: 'صاحب مجموع الفتاوى'
+        },
+        'ibn-kathir': {
+            name: 'الإمام ابن كثير',
+            info: 'صاحب تفسير القرآن العظيم والبداية والنهاية'
+        }
+    };
+
     const chatForm = document.getElementById('chatForm');
     const chatContainer = document.getElementById('chatContainer');
     const messageInput = document.getElementById('messageInput');
     const loadingOverlay = document.getElementById('loadingOverlay');
-    const messageCount = document.getElementById('messageCount');
-    const startTime = document.getElementById('startTime');
+    const scholarSelect = document.getElementById('scholarSelect');
+    const scholarName = document.getElementById('scholarName');
+    const scholarInfoElement = document.getElementById('scholarInfo');
 
-    // تعيين وقت بدء المحادثة
-    startTime.textContent = new Date().toLocaleTimeString('ar-EG');
-    let messages = [];
+    // تحديث معلومات العالم عند التغيير
+    scholarSelect.addEventListener('change', function() {
+        const scholar = scholarInfo[this.value];
+        scholarName.textContent = scholar.name;
+        scholarInfoElement.textContent = scholar.info;
+    });
 
     chatForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const message = messageInput.value.trim();
+        const selectedScholar = scholarSelect.value;
+        
         if (!message) return;
 
         // إضافة رسالة المستخدم
@@ -126,15 +205,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ message: message })
+                body: JSON.stringify({ 
+                    message: message,
+                    scholar: selectedScholar
+                })
             });
 
             const data = await response.json();
             
             if (response.ok) {
-                // إضافة رد الفقيه
-                addMessage('assistant', formatResponse(data.response));
-                updateMessageCount();
+                addMessage('scholar', formatResponse(data.response));
+                updateChatHistory(message, data.response);
             } else {
                 showAlert('error', data.error || 'حدث خطأ في معالجة طلبك');
             }
@@ -146,15 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // إضافة رسالة جديدة
     function addMessage(role, content) {
-        const message = {
-            role: role,
-            content: content,
-            timestamp: new Date().toLocaleTimeString('ar-EG')
-        };
-        messages.push(message);
-        
         const messageElement = document.createElement('div');
         messageElement.className = `chat-message ${role}-message`;
         messageElement.innerHTML = `
@@ -163,92 +236,40 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="message-info">
                 <small class="text-muted">
-                    <i class="fas fa-clock me-1"></i>${message.timestamp}
+                    <i class="fas fa-clock me-1"></i>${new Date().toLocaleTimeString('ar-EG')}
                 </small>
             </div>
         `;
         
         chatContainer.appendChild(messageElement);
-        updateMessageCount();
     }
 
-    // تنسيق الرد
     function formatResponse(response) {
         if (typeof response === 'string') {
             return response.replace(/\n/g, '<br>');
         }
+        return response;
+    }
 
-        let formattedResponse = '';
+    function updateChatHistory(question, answer) {
+        const chatHistory = document.getElementById('chatHistory');
+        const historyItem = document.createElement('a');
+        historyItem.className = 'list-group-item list-group-item-action';
+        historyItem.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-truncate">${question}</div>
+                <small class="text-muted">${new Date().toLocaleTimeString('ar-EG')}</small>
+            </div>
+        `;
         
-        // تنسيق الأقسام
-        if (Array.isArray(response)) {
-            response.forEach(section => {
-                if (section.title) {
-                    formattedResponse += `<div class="response-section">
-                        <h5 class="section-title">${section.title}</h5>
-                        <div class="section-content">${section.content}</div>
-                    </div>`;
-                } else {
-                    formattedResponse += `<div class="response-section">
-                        <div class="section-content">${section.content}</div>
-                    </div>`;
-                }
-            });
-        } else {
-            formattedResponse = response;
-        }
-
-        return formattedResponse;
-    }
-
-    // تحديث عداد الرسائل
-    function updateMessageCount() {
-        messageCount.textContent = messages.length;
-    }
-
-    // مسح المحادثة
-    window.clearChat = function() {
-        if (confirm('هل أنت متأكد من مسح المحادثة؟')) {
-            chatContainer.innerHTML = '';
-            messages = [];
-            updateMessageCount();
-        }
-    }
-
-    // حفظ المحادثة
-    window.saveChat = function() {
-        const chatText = messages.map(msg => 
-            `[${msg.timestamp}] ${msg.role === 'user' ? 'أنت' : 'الفقيه'}:\n${msg.content}`
-        ).join('\n\n');
+        historyItem.addEventListener('click', () => {
+            addMessage('user', question);
+            addMessage('scholar', answer);
+        });
         
-        const blob = new Blob([chatText], { type: 'text/plain' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `chat_${new Date().toLocaleDateString('ar-EG')}.txt`;
-        a.click();
-        window.URL.revokeObjectURL(url);
+        chatHistory.insertBefore(historyItem, chatHistory.firstChild);
     }
 
-    // مشاركة المحادثة
-    window.shareChat = function() {
-        const chatText = messages.map(msg => 
-            `[${msg.timestamp}] ${msg.role === 'user' ? 'أنت' : 'الفقيه'}:\n${msg.content}`
-        ).join('\n\n');
-        
-        if (navigator.share) {
-            navigator.share({
-                title: 'محادثتي مع الفقيه AI',
-                text: chatText
-            }).catch(console.error);
-        } else {
-            navigator.clipboard.writeText(chatText).then(() => {
-                showAlert('success', 'تم نسخ المحادثة إلى الحافظة');
-            });
-        }
-    }
-
-    // عرض التنبيهات
     function showAlert(type, message) {
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
@@ -264,7 +285,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
 
-    // تعديل ارتفاع textarea تلقائياً
     messageInput.addEventListener('input', function() {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
@@ -289,7 +309,7 @@ document.addEventListener('DOMContentLoaded', function() {
     float: right;
 }
 
-.assistant-message {
+.scholar-message {
     float: left;
 }
 
@@ -304,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function() {
     border-bottom-right-radius: 5px;
 }
 
-.assistant-message .message-content {
+.scholar-message .message-content {
     background-color: #f8f9fa;
     border-bottom-left-radius: 5px;
 }
@@ -317,19 +337,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .user-message .message-info {
     text-align: left;
-}
-
-.response-section {
-    margin-bottom: 1rem;
-}
-
-.section-title {
-    color: var(--bs-primary);
-    margin-bottom: 0.5rem;
-}
-
-.section-content {
-    line-height: 1.6;
 }
 
 .loading-overlay {
@@ -345,8 +352,8 @@ document.addEventListener('DOMContentLoaded', function() {
     z-index: 9999;
 }
 
-.chat-info p {
-    margin-bottom: 0.5rem;
+.scholar-info {
+    transition: all 0.3s ease;
 }
 
 @media (max-width: 768px) {
