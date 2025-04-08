@@ -1,260 +1,240 @@
-{% extends "base.html" %}
-
-{% block content %}
-<div class="container mt-5">
-    <!-- Hero Section -->
-    <div class="text-center mb-5">
-        <h1 class="display-4 mb-3">مرحباً بك في الفقيه AI</h1>
-        <p class="lead mb-4">مستشارك الإسلامي الذكي للإجابة على استفساراتك الشرعية</p>
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card bg-gradient shadow-lg">
-                    <div class="card-body p-4">
-                        <p class="text-muted">
-                            نحن نستخدم تقنيات الذكاء الاصطناعي المتقدمة لمساعدتك في فهم دينك بشكل أفضل
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- API Key Section -->
-    <div class="row mb-5">
-        <div class="col-md-8 mx-auto">
-            <div class="card shadow-lg">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-key me-2"></i>
-                        إعداد مفتاح Google Gemini API
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div id="apiKeyStatus" class="alert" style="display: none;"></div>
-                    <form id="apiKeyForm" class="mb-3">
-                        <div class="form-group">
-                            <label for="apiKey" class="form-label">مفتاح API:</label>
-                            <div class="input-group">
-                                <input type="password" class="form-control" id="apiKey" required
-                                    placeholder="أدخل مفتاح API الخاص بك هنا">
-                                <button type="button" class="btn btn-outline-secondary" onclick="toggleApiKeyVisibility()">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                            <div class="mt-3 d-flex justify-content-between">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-1"></i>
-                                    حفظ المفتاح
-                                </button>
-                                <button type="button" class="btn btn-danger" onclick="deleteApiKey()">
-                                    <i class="fas fa-trash me-1"></i>
-                                    حذف المفتاح
-                                </button>
-                            </div>
-                            <div class="form-text mt-2">
-                                <i class="fas fa-info-circle me-1"></i>
-                                يمكنك الحصول على مفتاح API من 
-                                <a href="https://makersuite.google.com/app/apikey" target="_blank" class="text-primary">
-                                    لوحة تحكم Google
-                                </a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Features Section -->
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card h-100 shadow-lg">
-                <div class="card-body text-center p-4">
-                    <div class="feature-icon mb-3">
-                        <i class="fas fa-comments fa-3x text-primary"></i>
-                    </div>
-                    <h5 class="card-title mb-3">المحادثة مع العلماء</h5>
-                    <p class="card-text">تحدث مع العلماء واحصل على إجابات لأسئلتك الدينية</p>
-                    <a href="/chat" class="btn btn-primary mt-3">ابدأ المحادثة</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100 shadow-lg">
-                <div class="card-body text-center p-4">
-                    <div class="feature-icon mb-3">
-                        <i class="fas fa-scroll fa-3x text-primary"></i>
-                    </div>
-                    <h5 class="card-title mb-3">الفتاوى</h5>
-                    <p class="card-text">احصل على فتاوى شرعية موثوقة في مختلف المسائل</p>
-                    <a href="/fatwa" class="btn btn-primary mt-3">اطلب فتوى</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100 shadow-lg">
-                <div class="card-body text-center p-4">
-                    <div class="feature-icon mb-3">
-                        <i class="fas fa-book-open fa-3x text-primary"></i>
-                    </div>
-                    <h5 class="card-title mb-3">القرآن والسنة</h5>
-                    <p class="card-text">ابحث في القرآن الكريم والأحاديث النبوية الشريفة</p>
-                    <a href="/quran_sunnah" class="btn btn-primary mt-3">ابدأ البحث</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100 shadow-lg">
-                <div class="card-body text-center p-4">
-                    <div class="feature-icon mb-3">
-                        <i class="fas fa-calculator fa-3x text-primary"></i>
-                    </div>
-                    <h5 class="card-title mb-3">حاسبة المواريث</h5>
-                    <p class="card-text">احسب المواريث بدقة حسب المذاهب الأربعة مع شرح تفصيلي</p>
-                    <a href="/inheritance" class="btn btn-primary mt-3">احسب الميراث</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-    .chat-message {
-        margin-bottom: 1.5rem;
-        line-height: 1.6;
-        text-align: right;
-    }
-    .chat-message p {
-        margin-bottom: 1rem;
-        text-align: justify;
-    }
-    .chat-message ol {
-        padding-right: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    .chat-message li {
-        margin-bottom: 0.5rem;
-    }
-    .chat-message .response-text {
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-</style>
-
-<div id="chatMessages" class="chat-container mb-4">
-    <div class="chat-message">
-        <div class="response-text">
-            <!-- Chat messages will be inserted here -->
-        </div>
-    </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    checkApiKeyStatus();
-    
-    document.getElementById('apiKeyForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const apiKey = document.getElementById('apiKey').value;
-        
-        fetch('/api/api-key', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ api_key: apiKey })
-        })
-        .then(response => response.json())
-        .then(data => {
-            const statusDiv = document.getElementById('apiKeyStatus');
-            if (data.error) {
-                statusDiv.className = 'alert alert-danger';
-                statusDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${data.error}`;
-            } else {
-                statusDiv.className = 'alert alert-success';
-                statusDiv.innerHTML = `<i class="fas fa-check-circle me-2"></i>${data.message}`;
-                document.getElementById('apiKey').value = '';
-            }
-            statusDiv.style.display = 'block';
-            checkApiKeyStatus();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            const statusDiv = document.getElementById('apiKeyStatus');
-            statusDiv.className = 'alert alert-danger';
-            statusDiv.innerHTML = '<i class="fas fa-times-circle me-2"></i>حدث خطأ أثناء حفظ المفتاح';
-            statusDiv.style.display = 'block';
-        });
-    });
-});
-
-function checkApiKeyStatus() {
-    fetch('/api/api-key/status')
-        .then(response => response.json())
-        .then(data => {
-            const statusDiv = document.getElementById('apiKeyStatus');
-            if (data.has_active_key) {
-                statusDiv.className = 'alert alert-info';
-                statusDiv.innerHTML = `
-                    <i class="fas fa-info-circle me-2"></i>
-                    يوجد مفتاح API نشط. آخر تحديث: ${new Date(data.last_updated).toLocaleString()}
-                `;
-            } else {
-                statusDiv.className = 'alert alert-warning';
-                statusDiv.innerHTML = `
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    لا يوجد مفتاح API نشط. الرجاء إدخال مفتاح.
-                `;
-            }
-            statusDiv.style.display = 'block';
-        });
-}
-
-function deleteApiKey() {
-    if (!confirm('هل أنت متأكد من حذف مفتاح API؟')) {
-        return;
-    }
-    
-    fetch('/api/api-key', {
-        method: 'DELETE'
-    })
-    .then(response => response.json())
-    .then(data => {
-        const statusDiv = document.getElementById('apiKeyStatus');
-        if (data.error) {
-            statusDiv.className = 'alert alert-danger';
-            statusDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${data.error}`;
-        } else {
-            statusDiv.className = 'alert alert-success';
-            statusDiv.innerHTML = `<i class="fas fa-check-circle me-2"></i>${data.message}`;
-            document.getElementById('apiKey').value = '';
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المذاهب الأربعة - الفقيه AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
         }
-        statusDiv.style.display = 'block';
-        checkApiKeyStatus();
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        const statusDiv = document.getElementById('apiKeyStatus');
-        statusDiv.className = 'alert alert-danger';
-        statusDiv.innerHTML = '<i class="fas fa-times-circle me-2"></i>حدث خطأ أثناء حذف المفتاح';
-        statusDiv.style.display = 'block';
-    });
-}
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+        .nav-link:hover {
+            color: #3498db;
+        }
+        .nav-link i {
+            margin-left: 8px;
+        }
+        .search-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .madhhab-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .madhhab-option {
+            text-align: center;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .madhhab-option:hover {
+            border-color: #2c3e50;
+            background-color: #f8f9fa;
+        }
+        .madhhab-option.selected {
+            border-color: #2c3e50;
+            background-color: #edf2f7;
+        }
+        .madhhab-option i {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .search-button {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .search-button:hover {
+            background-color: #34495e;
+        }
+        .search-button i {
+            margin-left: 8px;
+        }
+        .result-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 30px;
+            display: none;
+        }
+        .loading {
+            text-align: center;
+            display: none;
+            margin: 20px 0;
+        }
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1>الفقيه AI</h1>
+                <div>
+                    <a href="/" class="nav-link"><i class="fas fa-mosque"></i>المذاهب الأربعة</a>
+                    <a href="/quran-sunnah" class="nav-link"><i class="fas fa-book-quran"></i>القرآن والسنة</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-function toggleApiKeyVisibility() {
-    const apiKeyInput = document.getElementById('apiKey');
-    const eyeIcon = document.querySelector('.btn-outline-secondary i');
-    if (apiKeyInput.type === 'password') {
-        apiKeyInput.type = 'text';
-        eyeIcon.classList.remove('fa-eye');
-        eyeIcon.classList.add('fa-eye-slash');
-    } else {
-        apiKeyInput.type = 'password';
-        eyeIcon.classList.remove('fa-eye-slash');
-        eyeIcon.classList.add('fa-eye');
-    }
-}
-</script>
-{% endblock %}
+    <div class="container">
+        <div class="search-container">
+            <h2 class="mb-4">اختر المذهب الفقهي</h2>
+            <div class="madhhab-selector">
+                <div class="madhhab-option" data-madhhab="all">
+                    <i class="fas fa-mosque"></i>
+                    <h4>جميع المذاهب</h4>
+                </div>
+                <div class="madhhab-option" data-madhhab="hanafi">
+                    <i class="fas fa-star"></i>
+                    <h4>الحنفي</h4>
+                </div>
+                <div class="madhhab-option" data-madhhab="maliki">
+                    <i class="fas fa-crescent"></i>
+                    <h4>المالكي</h4>
+                </div>
+                <div class="madhhab-option" data-madhhab="shafii">
+                    <i class="fas fa-moon"></i>
+                    <h4>الشافعي</h4>
+                </div>
+                <div class="madhhab-option" data-madhhab="hanbali">
+                    <i class="fas fa-kaaba"></i>
+                    <h4>الحنبلي</h4>
+                </div>
+            </div>
+            <textarea id="question" class="search-input" rows="4" placeholder="اكتب سؤالك هنا..."></textarea>
+            <button id="searchButton" class="search-button"><i class="fas fa-search"></i>بحث</button>
+            <div id="errorMessage" class="error-message"></div>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">جاري التحميل...</span>
+            </div>
+            <p class="mt-2">جاري البحث...</p>
+        </div>
+
+        <div id="resultContainer" class="result-container">
+            <h3>النتائج</h3>
+            <div id="result" class="mt-3"></div>
+        </div>
+    </div>
+
+    <script>
+        // Handle madhhab selection
+        const madhhabOptions = document.querySelectorAll('.madhhab-option');
+        let selectedMadhhab = '';
+
+        madhhabOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                madhhabOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedMadhhab = option.dataset.madhhab;
+            });
+        });
+
+        document.getElementById('searchButton').addEventListener('click', async () => {
+            const question = document.getElementById('question').value.trim();
+            const resultContainer = document.getElementById('resultContainer');
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('errorMessage');
+            const result = document.getElementById('result');
+
+            if (!question) {
+                errorMessage.textContent = 'الرجاء إدخال سؤال';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            if (!selectedMadhhab) {
+                errorMessage.textContent = 'الرجاء اختيار المذهب';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            errorMessage.style.display = 'none';
+            loading.style.display = 'block';
+            resultContainer.style.display = 'none';
+
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        madhhab: selectedMadhhab
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    result.innerHTML = data.response.replace(/\n/g, '<br>');
+                    resultContainer.style.display = 'block';
+                } else {
+                    errorMessage.textContent = data.error || 'حدث خطأ أثناء معالجة طلبك';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                errorMessage.textContent = 'حدث خطأ في الاتصال';
+                errorMessage.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html> 
