@@ -265,6 +265,28 @@ def ask_quran_sunnah():
             'message': 'حدث خطأ أثناء معالجة طلبك'
         }), 500
 
+@app.route('/test-api-key', methods=['POST'])
+def test_api_key():
+    """فحص صلاحية مفتاح Gemini API المرسل من المستخدم"""
+    try:
+        data = request.get_json()
+        user_api_key = data.get('api_key', '').strip()
+        if not user_api_key:
+            return jsonify({'status': 'error', 'message': 'يرجى إدخال مفتاح API'}), 400
+        try:
+            genai.configure(api_key=user_api_key)
+            model = genai.GenerativeModel('models/gemini-2.0-flash-001')
+            prompt = "Say 'نجح الاتصال' in Arabic."
+            response = model.generate_content(prompt)
+            if response and response.text and 'نجح الاتصال' in response.text:
+                return jsonify({'status': 'success', 'message': 'تم التحقق من المفتاح بنجاح'}), 200
+            else:
+                return jsonify({'status': 'error', 'message': 'لم يتم التحقق من المفتاح. يرجى التأكد من صحته.'}), 400
+        except Exception as e:
+            return jsonify({'status': 'error', 'message': f'فشل التحقق من المفتاح: {str(e)}'}), 400
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': 'حدث خطأ أثناء معالجة الطلب'}), 500
+
 def parse_response_sections(response_text):
     """تقسيم النص إلى أقسام باستخدام العناوين"""
     sections = {}
