@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, jsonify, send_from_directory
 import os
-from dotenv import load_dotenv
 import google.generativeai as genai
 import logging
 import traceback
@@ -8,30 +7,6 @@ import traceback
 # تهيئة التسجيل
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-
-# تحميل المتغيرات البيئية
-load_dotenv()
-
-# تهيئة Gemini API
-api_key = os.getenv('GOOGLE_API_KEY')
-if not api_key:
-    logger.error("API key not found in .env file")
-    raise ValueError("الرجاء تعيين GOOGLE_API_KEY في ملف .env")
-
-logger.info(f"API Key found: {api_key[:5]}...{api_key[-5:]}")
-
-# تهيئة النموذج
-try:
-    logger.info("Configuring API with provided key...")
-    genai.configure(api_key=api_key)
-    
-    logger.info("Initializing Gemini model...")
-    model = genai.GenerativeModel('models/gemini-2.0-flash-001')
-    logger.info("Model initialized successfully")
-except Exception as e:
-    logger.error(f"Error initializing model: {str(e)}")
-    logger.error(f"Traceback: {traceback.format_exc()}")
-    raise
 
 # تهيئة تطبيق Flask
 app = Flask(__name__)
@@ -62,6 +37,9 @@ def quran_sunnah():
 def chat():
     """معالجة المحادثة"""
     try:
+        api_key = request.headers.get('GEMINI_API_KEY')
+        if not api_key:
+            return jsonify({'status': 'error', 'message': 'API key is required'}), 401
         data = request.get_json()
         question = data.get('question')
         madhhab = data.get('madhhab')
@@ -97,6 +75,14 @@ def chat():
             3. آراء العلماء المعتبرين
             4. التعليل والحكمة من الحكم"""
 
+        # تهيئة Gemini API بالمفتاح المرسل
+        try:
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel('models/gemini-2.0-flash-001')
+        except Exception as e:
+            logger.error(f"Error initializing Gemini: {str(e)}")
+            return jsonify({'status': 'error', 'message': 'فشل في تهيئة Gemini API'}), 500
+
         # الحصول على الإجابة من Gemini
         logger.info("Sending prompt to model...")
         response = model.generate_content(prompt)
@@ -130,6 +116,9 @@ def chat():
 def ask_quran_sunnah():
     """معالجة الأسئلة المتعلقة بالقرآن والسنة"""
     try:
+        api_key = request.headers.get('GEMINI_API_KEY')
+        if not api_key:
+            return jsonify({'status': 'error', 'message': 'API key is required'}), 401
         data = request.get_json()
         question = data.get('question')
         search_type = data.get('type', 'both')  # 'quran', 'hadith', or 'both'
@@ -142,6 +131,14 @@ def ask_quran_sunnah():
 
         logger.info(f"Processing Quran/Sunnah request. Question: {question}, Type: {search_type}")
         answers = {}
+
+        # تهيئة Gemini API بالمفتاح المرسل
+        try:
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel('models/gemini-2.0-flash-001')
+        except Exception as e:
+            logger.error(f"Error initializing Gemini: {str(e)}")
+            return jsonify({'status': 'error', 'message': 'فشل في تهيئة Gemini API'}), 500
         
         # البحث في القرآن
         if search_type in ['quran', 'both']:
@@ -173,7 +170,6 @@ def ask_quran_sunnah():
                 quran_response = model.generate_content(quran_prompt)
                 if quran_response and quran_response.text:
                     logger.info("Successfully received Quran response")
-                    # تنظيف وتنسيق النص
                     formatted_response = quran_response.text.strip()
                     answers['quran'] = {
                         'full_response': formatted_response,
@@ -198,10 +194,10 @@ def ask_quran_sunnah():
             قم بتنسيق إجابتك بالضبط كما يلي، مع الحفاظ على العناوين كما هي:
             
             ### الأحاديث المتعلقة بالموضوع ###
-            [اذكر الأحاديث كاملة مع تخريجها ودرجتها]
+            [اذكر الأحاديث مع تخريجها]
             
-            ### شرح الأحاديث ###
-            [اشرح معاني الأحاديث من كتب الشروح المعتمدة مثل فتح الباري، شرح النووي]
+            ### الشرح والمعنى ###
+            [اشرح الأحاديث وبيّن معناها]
             
             ### الأحكام المستنبطة ###
             [اذكر الأحكام الشرعية المستنبطة من الأحاديث]
@@ -211,12 +207,10 @@ def ask_quran_sunnah():
             
             ### المصادر ###
             [اذكر المصادر التي رجعت إليها]"""
-            
             try:
                 hadith_response = model.generate_content(hadith_prompt)
                 if hadith_response and hadith_response.text:
                     logger.info("Successfully received Hadith response")
-                    # تنظيف وتنسيق النص
                     formatted_response = hadith_response.text.strip()
                     answers['hadith'] = {
                         'full_response': formatted_response,
@@ -229,63 +223,34 @@ def ask_quran_sunnah():
                 logger.error(f"Error generating Hadith response: {str(e)}")
                 answers['hadith_error'] = str(e)
 
-        if answers:
-            # تحقق من وجود أخطاء
-            errors = {}
-            if 'quran_error' in answers:
-                errors['quran'] = answers.pop('quran_error')
-            if 'hadith_error' in answers:
-                errors['hadith'] = answers.pop('hadith_error')
-            
-            response_data = {
-                'status': 'success',
-                'data': answers,
-                'question': question,
-                'search_type': search_type
-            }
-            
-            if errors:
-                response_data['errors'] = errors
-            
-            logger.info(f"Sending response with data keys: {list(answers.keys())}")
-            return jsonify(response_data)
-        else:
-            logger.warning("No answers found")
-            return jsonify({
-                'status': 'error',
-                'message': 'لم يتم العثور على إجابات في المصادر المطلوبة'
-            }), 500
+        return jsonify({'status': 'success', 'data': answers})
 
     except Exception as e:
         logger.error(f"Error in ask_quran_sunnah: {str(e)}")
-        logger.error(f"Error type: {type(e).__name__}")
         logger.error(f"Traceback: {traceback.format_exc()}")
-        return jsonify({
-            'status': 'error',
-            'message': 'حدث خطأ أثناء معالجة طلبك'
-        }), 500
+        return jsonify({'status': 'error', 'message': 'حدث خطأ أثناء معالجة طلبك'}), 500
 
 @app.route('/test-api-key', methods=['POST'])
 def test_api_key():
-    """فحص صلاحية مفتاح Gemini API المرسل من المستخدم"""
     try:
-        data = request.get_json()
-        user_api_key = data.get('api_key', '').strip()
-        if not user_api_key:
-            return jsonify({'status': 'error', 'message': 'يرجى إدخال مفتاح API'}), 400
+        api_key = request.headers.get('GEMINI_API_KEY')
+        if not api_key:
+            return jsonify({'status': 'error', 'message': 'API key is required'}), 401
         try:
-            genai.configure(api_key=user_api_key)
+            genai.configure(api_key=api_key)
             model = genai.GenerativeModel('models/gemini-2.0-flash-001')
-            prompt = "Say 'نجح الاتصال' in Arabic."
-            response = model.generate_content(prompt)
-            if response and response.text and 'نجح الاتصال' in response.text:
-                return jsonify({'status': 'success', 'message': 'تم التحقق من المفتاح بنجاح'}), 200
+            # اختبار بسيط
+            response = model.generate_content("قل: مفتاح API يعمل بنجاح")
+            if response and response.text:
+                return jsonify({'status': 'success', 'message': response.text})
             else:
-                return jsonify({'status': 'error', 'message': 'لم يتم التحقق من المفتاح. يرجى التأكد من صحته.'}), 400
+                return jsonify({'status': 'error', 'message': 'لم يتم استلام رد من Gemini'}), 500
         except Exception as e:
-            return jsonify({'status': 'error', 'message': f'فشل التحقق من المفتاح: {str(e)}'}), 400
+            logger.error(f"Error testing API key: {str(e)}")
+            return jsonify({'status': 'error', 'message': 'مفتاح API غير صالح أو حدث خطأ'}), 400
     except Exception as e:
-        return jsonify({'status': 'error', 'message': 'حدث خطأ أثناء معالجة الطلب'}), 500
+        logger.error(f"Error in test_api_key: {str(e)}")
+        return jsonify({'status': 'error', 'message': 'حدث خطأ أثناء اختبار المفتاح'}), 500
 
 def parse_response_sections(response_text):
     """تقسيم النص إلى أقسام باستخدام العناوين"""

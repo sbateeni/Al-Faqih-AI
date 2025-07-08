@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الفقيه AI - الصفحة الرئيسية</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             background-color: #f5f5f5;
@@ -122,11 +122,17 @@
     <div class="api-section text-center">
         <div class="mb-4">
             <label for="apiKeyInput" class="form-label">أدخل مفتاح Google Gemini API الخاص بك</label>
-            <input type="text" id="apiKeyInput" class="form-control text-center" placeholder="مثال: AIzaSy..." autocomplete="off">
+            <div class="input-group mb-3">
+                <input type="password" id="apiKeyInput" class="form-control text-center" placeholder="مثال: AIzaSy..." autocomplete="off">
+                <button class="btn btn-outline-secondary" type="button" id="toggleApiKeyVisibility">
+                    <span id="eyeIcon" class="fa fa-eye"></span>
+                </button>
+                <button class="btn btn-primary" type="button" id="saveApiKeyBtn">حفظ المفتاح</button>
+            </div>
+            <div id="apiKeyStatus" class="text-success"></div>
         </div>
         <div class="btn-group mb-3">
             <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" class="btn btn-outline-primary">الحصول على مفتاح Gemini API</a>
-            <button id="saveApiKey" class="btn btn-outline-success">حفظ المفتاح</button>
             <button id="testApiKey" class="btn btn-outline-info">فحص الاتصال</button>
         </div>
         <div id="alertSuccess" class="alert alert-success" role="alert"></div>
@@ -153,6 +159,22 @@
             <p class="mb-0">الفقيه AI - نظام ذكاء اصطناعي للفتاوى الشرعية</p>
         </div>
     </div>
+    <!-- Modal لإدخال مفتاح Gemini API -->
+    <div class="modal" tabindex="-1" id="apiKeyModal">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center">
+          <div class="modal-header">
+            <h5 class="modal-title">إدخال مفتاح Gemini API</h5>
+          </div>
+          <div class="modal-body">
+            <input type="password" id="modalApiKeyInput" class="form-control text-center mb-3" placeholder="مثال: AIzaSy..." autocomplete="off">
+            <button class="btn btn-primary" id="modalSaveApiKeyBtn">حفظ المفتاح</button>
+            <div id="modalApiKeyStatus" class="text-success mt-2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/static/api_key.js"></script>
     <script>
         // تحميل المفتاح من localStorage عند فتح الصفحة
         document.addEventListener('DOMContentLoaded', function() {
@@ -163,7 +185,7 @@
         });
 
         // زر الحفظ
-        document.getElementById('saveApiKey').onclick = function() {
+        document.getElementById('saveApiKeyBtn').addEventListener('click', function() {
             const key = document.getElementById('apiKeyInput').value.trim();
             if (!key) {
                 showError('يرجى إدخال مفتاح API أولاً');
@@ -171,7 +193,7 @@
             }
             localStorage.setItem('user_gemini_api_key', key);
             showSuccess('تم حفظ مفتاح API بنجاح في متصفحك!');
-        };
+        });
 
         // زر الفحص
         document.getElementById('testApiKey').onclick = async function() {
@@ -198,6 +220,39 @@
                 showError('حدث خطأ في الاتصال بالخادم');
             }
         };
+
+        // تبديل طريقة العرض للمفتاح
+        document.getElementById('toggleApiKeyVisibility').addEventListener('click', function() {
+            const input = document.getElementById('apiKeyInput');
+            const icon = document.getElementById('eyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // حفظ المفتاح عند التحميل
+        document.getElementById('saveApiKeyBtn').addEventListener('click', function() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            if (apiKey) {
+                localStorage.setItem('GEMINI_API_KEY', apiKey);
+                document.getElementById('apiKeyStatus').textContent = 'تم حفظ المفتاح بنجاح!';
+            } else {
+                document.getElementById('apiKeyStatus').textContent = 'الرجاء إدخال مفتاح صحيح.';
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', function() {
+            const apiKey = localStorage.getItem('GEMINI_API_KEY');
+            if (apiKey) {
+                document.getElementById('apiKeyInput').value = apiKey;
+            }
+        });
 
         function showSuccess(msg) {
             document.getElementById('alertSuccess').textContent = msg;

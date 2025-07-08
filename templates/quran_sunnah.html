@@ -192,6 +192,22 @@
         </div>
     </div>
 
+    <!-- Modal لإدخال مفتاح Gemini API -->
+    <div class="modal" tabindex="-1" id="apiKeyModal">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center">
+          <div class="modal-header">
+            <h5 class="modal-title">إدخال مفتاح Gemini API</h5>
+          </div>
+          <div class="modal-body">
+            <input type="password" id="modalApiKeyInput" class="form-control text-center mb-3" placeholder="مثال: AIzaSy..." autocomplete="off">
+            <button class="btn btn-primary" id="modalSaveApiKeyBtn">حفظ المفتاح</button>
+            <div id="modalApiKeyStatus" class="text-success mt-2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/static/api_key.js"></script>
     <script>
         // Handle search type selection
         const searchOptions = document.querySelectorAll('.search-option');
@@ -280,10 +296,18 @@
             try {
                 console.log('Sending request:', { question, type: selectedType }); // للتشخيص
 
+                const apiKey = localStorage.getItem('GEMINI_API_KEY');
+                if (!apiKey) {
+                    errorMessage.textContent = 'الرجاء إدخال مفتاح API أولاً في الصفحة الرئيسية.';
+                    errorMessage.style.display = 'block';
+                    loading.style.display = 'none';
+                    return;
+                }
                 const response = await fetch('/ask-quran-sunnah', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'GEMINI_API_KEY': apiKey
                     },
                     body: JSON.stringify({
                         question: question,
