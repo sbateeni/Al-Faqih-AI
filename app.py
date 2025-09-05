@@ -3,10 +3,18 @@ import os
 import google.generativeai as genai
 import logging
 import traceback
+from dotenv import load_dotenv
+from madhhab_service import MadhahibService
+
+# تحميل متغيرات البيئة
+load_dotenv()
 
 # تهيئة التسجيل
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+# تهيئة خدمة المذاهب
+madhhab_service = MadhahibService()
 
 # تهيئة تطبيق Flask
 app = Flask(__name__)
@@ -37,9 +45,11 @@ def quran_sunnah():
 def chat():
     """معالجة المحادثة"""
     try:
-        api_key = request.headers.get('GEMINI_API_KEY')
+        # تجربة الحصول على المفتاح من الـ headers أولاً، ثم من متغيرات البيئة
+        api_key = request.headers.get('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
         if not api_key:
             return jsonify({'status': 'error', 'message': 'API key is required'}), 401
+            
         data = request.get_json()
         question = data.get('question')
         madhhab = data.get('madhhab')
@@ -52,56 +62,46 @@ def chat():
 
         logger.info(f"Processing chat request. Question: {question}, Madhhab: {madhhab}")
 
-        # بناء النص التوجيهي
-        if madhhab:
-            prompt = f"""أنت عالم إسلامي متخصص في المذهب {madhhab}. 
-            الرجاء الإجابة على السؤال التالي وفقاً لهذا المذهب:
+        if madhhab and madhhab != 'all':
+            # إجابة من مذهب واحد محدد
+            # تحويل الاسم من الإنجليزية إلى العربية
+            madhhab_mapping = {
+                'hanafi': 'الحنفي',
+                'maliki': 'المالكي',
+                'shafii': 'الشافعي',
+                'hanbali': 'الحنبلي'
+            }
             
-            السؤال: {question}
+            arabic_madhhab = madhhab_mapping.get(madhhab, madhhab)
+            if not arabic_madhhab:
+                return jsonify({
+                    'status': 'error',
+                    'message': f'المذهب {madhhab} غير متوفر'
+                }), 400
+                
+            response_text = madhhab_service.get_single_madhhab_response(arabic_madhhab, question, api_key)
             
-            يجب أن تتضمن الإجابة:
-            1. الحكم الشرعي
-            2. الدليل من القرآن أو السنة إن وجد
-            3. أقوال علماء المذهب {madhhab}
-            4. التعليل والحكمة من الحكم"""
-        else:
-            prompt = f"""الرجاء الإجابة على السؤال التالي من منظور إسلامي عام:
-            
-            السؤال: {question}
-            
-            يجب أن تتضمن الإجابة:
-            1. الحكم الشرعي
-            2. الدليل من القرآن أو السنة إن وجد
-            3. آراء العلماء المعتبرين
-            4. التعليل والحكمة من الحكم"""
-
-        # تهيئة Gemini API بالمفتاح المرسل
-        try:
-            genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('models/gemini-2.0-flash-001')
-        except Exception as e:
-            logger.error(f"Error initializing Gemini: {str(e)}")
-            return jsonify({'status': 'error', 'message': 'فشل في تهيئة Gemini API'}), 500
-
-        # الحصول على الإجابة من Gemini
-        logger.info("Sending prompt to model...")
-        response = model.generate_content(prompt)
-        
-        if response and response.text:
-            logger.info("Successfully received response from model")
             return jsonify({
                 'status': 'success',
                 'data': {
-                    'answer': response.text,
+                    'answer': response_text,
                     'madhhab': madhhab
                 }
             })
+        
         else:
-            logger.warning("Received empty response from model")
+            # إجابة من جميع المذاهب الأربعة
+            responses = madhhab_service.get_all_madhahib_responses(question, api_key)
+            combined_answer = madhhab_service.format_combined_response(responses)
+            
             return jsonify({
-                'status': 'error',
-                'message': 'لم يتم استلام إجابة من النموذج'
-            }), 500
+                'status': 'success',
+                'data': {
+                    'answer': combined_answer,
+                    'madhhab': 'all',
+                    'individual_responses': responses
+                }
+            })
 
     except Exception as e:
         logger.error(f"Error in chat: {str(e)}")
@@ -116,7 +116,8 @@ def chat():
 def ask_quran_sunnah():
     """معالجة الأسئلة المتعلقة بالقرآن والسنة"""
     try:
-        api_key = request.headers.get('GEMINI_API_KEY')
+        # تجربة الحصول على المفتاح من الـ headers أولاً، ثم من متغيرات البيئة
+        api_key = request.headers.get('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
         if not api_key:
             return jsonify({'status': 'error', 'message': 'API key is required'}), 401
         data = request.get_json()
@@ -233,7 +234,8 @@ def ask_quran_sunnah():
 @app.route('/test-api-key', methods=['POST'])
 def test_api_key():
     try:
-        api_key = request.headers.get('GEMINI_API_KEY')
+        # تجربة الحصول على المفتاح من الـ headers أولاً، ثم من متغيرات البيئة
+        api_key = request.headers.get('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
         if not api_key:
             return jsonify({'status': 'error', 'message': 'API key is required'}), 401
         try:

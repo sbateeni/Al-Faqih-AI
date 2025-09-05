@@ -113,6 +113,21 @@
             margin-top: 10px;
             display: none;
         }
+        .madhhab-response {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #2c3e50;
+            border-radius: 5px;
+        }
+        .madhhab-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -187,6 +202,7 @@
         </div>
       </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/api_key.js"></script>
     <script>
         // Handle madhhab selection
@@ -248,7 +264,29 @@
                 const data = await response.json();
 
                 if (data.status === 'success') {
-                    result.innerHTML = data.data.answer.replace(/\n/g, '<br>');
+                    if (data.data.madhhab === 'all' && data.data.individual_responses) {
+                        // عرض الإجابات من جميع المذاهب بتنسيق جميل
+                        let formattedResponse = '<div class="all-madhahib-responses">';
+                        
+                        const madhahib = ['الحنفي', 'المالكي', 'الشافعي', 'الحنبلي'];
+                        
+                        madhahib.forEach(madhhab => {
+                            if (data.data.individual_responses[madhhab]) {
+                                formattedResponse += `
+                                    <div class="madhhab-response">
+                                        <div class="madhhab-title">إجابة المذهب ${madhhab}</div>
+                                        <div class="madhhab-content">${data.data.individual_responses[madhhab].replace(/\n/g, '<br>')}</div>
+                                    </div>
+                                `;
+                            }
+                        });
+                        
+                        formattedResponse += '</div>';
+                        result.innerHTML = formattedResponse;
+                    } else {
+                        // عرض إجابة مذهب واحد
+                        result.innerHTML = data.data.answer.replace(/\n/g, '<br>');
+                    }
                     resultContainer.style.display = 'block';
                 } else {
                     errorMessage.textContent = data.message || 'حدث خطأ أثناء معالجة طلبك';
