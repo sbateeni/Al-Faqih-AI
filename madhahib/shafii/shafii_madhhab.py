@@ -36,7 +36,7 @@ class ShafiiMadhhab(BaseMadhhab):
             "الإمام السيوطي"
         ]
     
-    def get_introduction(self):
+    def get_introduction(self) -> str:
         """مقدمة عن المذهب الشافعي"""
         return f"""أنا المذهب {self.arabic_name}، مذهب الوسطية والتوازن في الفقه الإسلامي.
         
@@ -50,7 +50,7 @@ class ShafiiMadhhab(BaseMadhhab):
         
         أنتشر في {', '.join(self.geographic_influence[:4])} وجنوب شرق آسيا والعديد من البلدان."""
     
-    def get_methodology(self):
+    def get_methodology(self) -> str:
         """منهجية المذهب الشافعي"""
         return """منهجيتي في الاستنباط تقوم على الأصول الأربعة:
         
@@ -65,7 +65,7 @@ class ShafiiMadhhab(BaseMadhhab):
         - الدقة في تطبيق الأصول الفقهية
         - عدم التوسع في الاجتهاد خارج النصوص"""
     
-    def get_famous_scholars(self):
+    def get_famous_scholars(self) -> str:
         """علماء المذهب الشافعي المشهورون"""
         return f"""من أبرز علمائي:
         
@@ -77,7 +77,7 @@ class ShafiiMadhhab(BaseMadhhab):
         • {self.famous_scholars[5]} - صاحب تحفة المحتاج
         • {self.famous_scholars[6]} - الإمام الموسوعي صاحب التفسير والحديث"""
     
-    def build_prompt(self, question):
+    def build_prompt(self, question: str) -> str:
         """بناء التوجيه المخصص للمذهب الشافعي"""
         base_prompt = super().build_prompt(question)
         

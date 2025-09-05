@@ -36,7 +36,7 @@ class HanafiMadhhab(BaseMadhhab):
             "الإمام ابن عابدين"
         ]
     
-    def get_introduction(self):
+    def get_introduction(self) -> str:
         """مقدمة عن المذهب الحنفي"""
         return f"""أنا المذهب {self.arabic_name}، أقدم المذاهب الفقهية الأربعة المعتبرة في الإسلام.
         
@@ -48,7 +48,7 @@ class HanafiMadhhab(BaseMadhhab):
         أنتشر بشكل واسع في {', '.join(self.geographic_influence[:3])} وغيرها من البلدان،
         ويتبعني أكثر من ثلث المسلمين في العالم."""
     
-    def get_methodology(self):
+    def get_methodology(self) -> str:
         """منهجية المذهب الحنفي"""
         return """منهجيتي في الاستنباط تقوم على:
         
@@ -61,7 +61,7 @@ class HanafiMadhhab(BaseMadhhab):
         
         أشتهر بمرونتي في التعامل مع المسائل الفقهية والنظر إلى مقاصد الشريعة."""
     
-    def get_famous_scholars(self):
+    def get_famous_scholars(self) -> str:
         """علماء المذهب الحنفي المشهورون"""
         return f"""من أبرز علمائي:
         
@@ -72,7 +72,7 @@ class HanafiMadhhab(BaseMadhhab):
         • {self.famous_scholars[4]} - صاحب المبسوط في الفقه الحنفي
         • {self.famous_scholars[5]} - صاحب رد المحتار على الدر المختار"""
     
-    def build_prompt(self, question):
+    def build_prompt(self, question: str) -> str:
         """بناء التوجيه المخصص للمذهب الحنفي"""
         base_prompt = super().build_prompt(question)
         

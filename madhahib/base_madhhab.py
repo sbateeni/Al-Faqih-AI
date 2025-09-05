@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Dict, List, Any
 import google.generativeai as genai
 import logging
 
@@ -18,21 +19,21 @@ class BaseMadhhab(ABC):
         self.famous_scholars = []
         
     @abstractmethod
-    def get_introduction(self):
+    def get_introduction(self) -> str:
         """Return an introduction about this madhhab"""
         pass
     
     @abstractmethod
-    def get_methodology(self):
+    def get_methodology(self) -> str:
         """Return the methodology of this madhhab"""
         pass
     
     @abstractmethod
-    def get_famous_scholars(self):
+    def get_famous_scholars(self) -> str:
         """Return famous scholars of this madhhab"""
         pass
     
-    def get_basic_info(self):
+    def get_basic_info(self) -> Dict[str, Any]:
         """Return basic information about the madhhab"""
         return {
             'name': self.name,
@@ -45,7 +46,7 @@ class BaseMadhhab(ABC):
             'famous_scholars': self.famous_scholars
         }
     
-    def build_prompt(self, question):
+    def build_prompt(self, question: str) -> str:
         """Build a specialized prompt for this madhhab"""
         return f"""أنا عالم إسلامي متخصص في المذهب {self.arabic_name}. 
         تحدث باسم المذهب {self.arabic_name} وأجب على السؤال التالي من منظور هذا المذهب:
@@ -63,7 +64,7 @@ class BaseMadhhab(ABC):
         5. المنهجية المميزة لهذا المذهب في الاستنباط
         6. التعليل والحكمة"""
     
-    def get_response(self, question, api_key):
+    def get_response(self, question: str, api_key: str) -> str:
         """Get a response from this madhhab for the given question"""
         try:
             genai.configure(api_key=api_key)

@@ -35,7 +35,7 @@ class HanbaliMadhhab(BaseMadhhab):
             "الإمام ابن مفلح"
         ]
     
-    def get_introduction(self):
+    def get_introduction(self) -> str:
         """مقدمة عن المذهب الحنبلي"""
         return f"""أنا المذهب {self.arabic_name}، مذهب أهل الحديث والأثر.
         
@@ -50,7 +50,7 @@ class HanbaliMadhhab(BaseMadhhab):
         أشتهر بالمحافظة على المنهج السلفي والتمسك بفهم السلف الصالح،
         وأنتشر بقوة في {', '.join(self.geographic_influence[:3])} ومنطقة الخليج."""
     
-    def get_methodology(self):
+    def get_methodology(self) -> str:
         """منهجية المذهب الحنبلي"""
         return """منهجيتي في الاستنباط تقوم على الترتيب التالي:
         
@@ -67,7 +67,7 @@ class HanbaliMadhhab(BaseMadhhab):
         - الحذر من التوسع في الاجتهاد
         - اتباع منهج السلف الصالح"""
     
-    def get_famous_scholars(self):
+    def get_famous_scholars(self) -> str:
         """علماء المذهب الحنبلي المشهورون"""
         return f"""من أبرز علمائي:
         
@@ -79,7 +79,7 @@ class HanbaliMadhhab(BaseMadhhab):
         • {self.famous_scholars[5]} - صاحب كشاف القناع
         • {self.famous_scholars[6]} - صاحب المبدع في شرح المقنع"""
     
-    def build_prompt(self, question):
+    def build_prompt(self, question: str) -> str:
         """بناء التوجيه المخصص للمذهب الحنبلي"""
         base_prompt = super().build_prompt(question)
         

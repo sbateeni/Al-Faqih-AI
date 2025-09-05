@@ -39,7 +39,7 @@ class MalikiMadhhab(BaseMadhhab):
             "الإمام الشاطبي"
         ]
     
-    def get_introduction(self):
+    def get_introduction(self) -> str:
         """مقدمة عن المذهب المالكي"""
         return f"""أنا المذهب {self.arabic_name}، مذهب أهل المدينة النبوية المباركة.
         
@@ -53,7 +53,7 @@ class MalikiMadhhab(BaseMadhhab):
         
         أنتشر بقوة في {', '.join(self.geographic_influence[:4])} وجميع بلدان شمال وغرب أفريقيا."""
     
-    def get_methodology(self):
+    def get_methodology(self) -> str:
         """منهجية المذهب المالكي"""
         return """منهجيتي في الاستنباط تقوم على:
         
@@ -67,7 +67,7 @@ class MalikiMadhhab(BaseMadhhab):
         
         أركز على الجانب العملي والواقعي في الأحكام الفقهية."""
     
-    def get_famous_scholars(self):
+    def get_famous_scholars(self) -> str:
         """علماء المذهب المالكي المشهورون"""
         return f"""من أبرز علمائي:
         
@@ -79,7 +79,7 @@ class MalikiMadhhab(BaseMadhhab):
         • {self.famous_scholars[5]} - صاحب الفروق المشهورة
         • {self.famous_scholars[6]} - صاحب الموافقات في أصول الشريعة"""
     
-    def build_prompt(self, question):
+    def build_prompt(self, question: str) -> str:
         """بناء التوجيه المخصص للمذهب المالكي"""
         base_prompt = super().build_prompt(question)
         
